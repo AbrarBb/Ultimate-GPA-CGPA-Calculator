@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#2563EB</color>
-    <color name="primary_dark">#1D4ED8</color>
-    <color name="primary_container">#DBEAFE</color>
+    <!-- Named palette tokens (as per UI Design Guidelines) -->
+    <color name="ink">#12181F</color>
+    <color name="paper">#FAFAF8</color>
+    <color name="deep_teal">#0F5C5B</color>
+    <color name="sun_gold">#E8A93C</color>
+    <color name="signal_green">#1E8E5A</color>
+    <color name="signal_red">#C4432B</color>
+    <color name="mist">#E7EAE8</color>
+
+    <!-- Dark mode specific variations -->
+    <color name="deep_teal_dark">#3A9998</color>
+    <color name="mist_dark">#1B232C</color>
+
+    <!-- Compatibility Aliases (maps generic layout references to themed tokens) -->
+    <color name="primary">@color/deep_teal</color>
+    <color name="primary_dark">@color/deep_teal</color>
     <color name="on_primary">#FFFFFF</color>
-    <color name="secondary">#0EA5E9</color>
-    <color name="surface">#F8FAFC</color>
-    <color name="surface_dark">#0F172A</color>
-    <color name="on_surface">#1E293B</color>
-    <color name="outline">#CBD5E1</color>
-    <color name="success">#16A34A</color>
-    <color name="error">#DC2626</color>
+    <color name="secondary">@color/sun_gold</color>
+    <color name="success">@color/signal_green</color>
+    <color name="error">@color/signal_red</color>
+    <color name="outline">@color/mist</color>
 </resources>

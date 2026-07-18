@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.GpaCalc" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorPrimaryContainer">@color/primary_container</item>
-        <item name="colorOnPrimary">@color/on_primary</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-        <item name="android:navigationBarColor">?android:attr/colorBackground</item>
+    <style name="Theme.GpaCalc" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Brand Colors -->
+        <item name="colorPrimary">@color/deep_teal</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/sun_gold</item>
+        <item name="colorTertiary">@color/signal_green</item>
+        
+        <!-- Surface and Background -->
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="colorSurface">@color/paper</item>
+        <item name="colorOnSurface">@color/ink</item>
+        <item name="colorSurfaceVariant">@color/mist</item>
+        <item name="colorOnSurfaceVariant">@color/ink</item>
+        
+        <!-- Outline / Divider -->
+        <item name="colorOutline">@color/mist</item>
+        <item name="colorOutlineVariant">@color/mist</item>
+        
+        <!-- Status & Navigation bars -->
+        <item name="android:statusBarColor">@color/deep_teal</item>
+        <item name="android:navigationBarColor">@color/paper</item>
+        
+        <!-- Alerts -->
+        <item name="colorError">@color/signal_red</item>
     </style>
 
     <style name="Widget.GpaCalc.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">16dp</item>
         <item name="cardElevation">2dp</item>
         <item name="contentPadding">16dp</item>
+        <item name="cardBackgroundColor">@color/paper</item>
     </style>
 </resources>
