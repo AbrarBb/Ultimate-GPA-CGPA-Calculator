@@ -64,6 +64,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // During development, wipe and reseed on schema change.
                             // Before production release: replace with proper Migration scripts.
                             .fallbackToDestructiveMigration()
+                            .allowMainThreadQueries()
                             .addCallback(seedCallback)
                             .build();
                 }
