@@ -48,6 +48,11 @@ public class HomeFragment extends Fragment {
                 ((MainActivity) requireActivity()).navigateToAdmission();
             }
         });
+        binding.cardStatistics.setOnClickListener(v -> {
+            if (requireActivity() instanceof MainActivity) {
+                ((MainActivity) requireActivity()).switchFragment(new com.khatibstudio.gpacalc.ui.statistics.StatisticsFragment(), true);
+            }
+        });
 
         // Observe school summary (async — no main-thread DB reads)
         viewModel.getSchoolSummaryLive().observe(getViewLifecycleOwner(),

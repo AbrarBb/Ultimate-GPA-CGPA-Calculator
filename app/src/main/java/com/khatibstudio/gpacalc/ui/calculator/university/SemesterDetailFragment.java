@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.khatibstudio.gpacalc.data.AppDatabase;
 import com.khatibstudio.gpacalc.databinding.FragmentSemesterDetailBinding;
 import com.khatibstudio.gpacalc.repository.GpaRepository;
 import com.khatibstudio.gpacalc.ui.common.FormDialogHelper;
@@ -53,28 +54,42 @@ public class SemesterDetailFragment extends Fragment {
         semesterId = requireArguments().getInt(ARG_SEMESTER_ID);
         String semesterName = requireArguments().getString(ARG_SEMESTER_NAME, "");
         binding.tvSemesterTitle.setText(semesterName);
-
-        com.khatibstudio.gpacalc.data.entity.Semester semester =
-                GpaRepository.getInstance(requireContext()).getSemesterById(semesterId);
-        scaleId = semester != null ? semester.scaleId : 1;
+        binding.tvSemesterGpa.setText("…");
 
         adapter = new CourseAdapter(viewModel::deleteCourse);
         binding.recyclerCourses.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerCourses.setAdapter(adapter);
 
-        binding.btnAddCourse.setOnClickListener(v ->
-                FormDialogHelper.showCourseDialog(requireContext(), viewModel, semesterId, scaleId,
-                        this::updateSemesterGpa));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            com.khatibstudio.gpacalc.data.entity.Semester semester =
+                    GpaRepository.getInstance(requireContext()).getSemesterById(semesterId);
+            scaleId = semester != null ? semester.scaleId : 1;
 
-        viewModel.getCourses(semesterId).observe(getViewLifecycleOwner(), courses -> {
-            adapter.submitList(courses);
-            updateSemesterGpa();
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                binding.btnAddCourse.setOnClickListener(v ->
+                        FormDialogHelper.showCourseDialog(requireContext(), viewModel, semesterId, scaleId,
+                                this::updateSemesterGpa));
+
+                viewModel.getCourses(semesterId).observe(getViewLifecycleOwner(), courses -> {
+                    adapter.submitList(courses);
+                    updateSemesterGpa();
+                });
+            });
         });
     }
 
     private void updateSemesterGpa() {
-        double gpa = viewModel.getSemesterGpa(semesterId);
-        binding.tvSemesterGpa.setText(String.format("%.2f", gpa));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            double gpa = viewModel.getSemesterGpa(semesterId);
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (binding != null) {
+                    binding.tvSemesterGpa.setText(String.format("%.2f", gpa));
+                }
+            });
+        });
     }
 
     @Override

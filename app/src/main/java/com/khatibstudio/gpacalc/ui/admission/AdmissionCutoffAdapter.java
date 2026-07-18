@@ -43,8 +43,8 @@ public class AdmissionCutoffAdapter
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdmissionCutoff cutoff = getItem(position);
-        holder.binding.tvUniversityName.setText(cutoff.universityName);
-        holder.binding.tvProgramName.setText(cutoff.programName);
+        holder.binding.tvUniversity.setText(cutoff.universityName);
+        holder.binding.tvProgram.setText(cutoff.programName);
         holder.binding.tvMinGpa.setText(
                 String.format("Min GPA: %.2f", cutoff.minGpaRequired));
         holder.binding.tvFormula.setText(cutoff.formulaNote);

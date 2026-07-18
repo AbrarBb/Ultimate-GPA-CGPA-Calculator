@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.popupmenu.PopupMenu;
+import androidx.appcompat.widget.PopupMenu;
 import com.khatibstudio.gpacalc.R;
 import com.khatibstudio.gpacalc.ads.AdManager;
 import com.khatibstudio.gpacalc.data.entity.GradingScale;

@@ -176,19 +176,24 @@ public class GpaRepository {
     public SchoolSummary calculateSchoolSummary(int profileId) {
         ExamRecord ssc = db.schoolDao().getExamRecordByType(profileId, ExamRecord.TYPE_SSC);
         ExamRecord hsc = db.schoolDao().getExamRecordByType(profileId, ExamRecord.TYPE_HSC);
-        double sscWith = 0, hscWith = 0;
+        double sscWith = 0, sscWithout = 0;
+        double hscWith = 0, hscWithout = 0;
         boolean hasSsc = false, hasHsc = false;
         if (ssc != null && !getSubjectsSync(ssc.id).isEmpty()) {
-            sscWith = calculateSchoolGpa(ssc.id).gpaWithFourth;
+            SchoolGpaCalculator.Result r = calculateSchoolGpa(ssc.id);
+            sscWith = r.gpaWithFourth;
+            sscWithout = r.gpaWithoutFourth;
             hasSsc = true;
         }
         if (hsc != null && !getSubjectsSync(hsc.id).isEmpty()) {
-            hscWith = calculateSchoolGpa(hsc.id).gpaWithFourth;
+            SchoolGpaCalculator.Result r = calculateSchoolGpa(hsc.id);
+            hscWith = r.gpaWithFourth;
+            hscWithout = r.gpaWithoutFourth;
             hasHsc = true;
         }
         double combined = (hasSsc && hasHsc)
                 ? SchoolGpaCalculator.combinedAverage(sscWith, hscWith) : 0;
-        return new SchoolSummary(ssc, hsc, sscWith, hscWith, combined, hasSsc, hasHsc);
+        return new SchoolSummary(ssc, hsc, sscWith, sscWithout, hscWith, hscWithout, combined, hasSsc, hasHsc);
     }
 
     // -------------------------------------------------------------------------
@@ -345,16 +350,20 @@ public class GpaRepository {
         public final ExamRecord ssc;
         public final ExamRecord hsc;
         public final double sscGpa;
+        public final double sscGpaWithoutFourth;
         public final double hscGpa;
+        public final double hscGpaWithoutFourth;
         public final double combined;
         public final boolean hasSsc;
         public final boolean hasHsc;
 
         public SchoolSummary(ExamRecord ssc, ExamRecord hsc,
-                             double sscGpa, double hscGpa,
+                             double sscGpa, double sscGpaWithoutFourth,
+                             double hscGpa, double hscGpaWithoutFourth,
                              double combined, boolean hasSsc, boolean hasHsc) {
             this.ssc = ssc; this.hsc = hsc;
-            this.sscGpa = sscGpa; this.hscGpa = hscGpa;
+            this.sscGpa = sscGpa; this.sscGpaWithoutFourth = sscGpaWithoutFourth;
+            this.hscGpa = hscGpa; this.hscGpaWithoutFourth = hscGpaWithoutFourth;
             this.combined = combined; this.hasSsc = hasSsc; this.hasHsc = hasHsc;
         }
     }
