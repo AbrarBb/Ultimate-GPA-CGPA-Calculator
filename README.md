@@ -269,7 +269,7 @@ For all others, require direct letter-grade selection — do not fabricate a tab
 ## 10. PROJECT FOLDER STRUCTURE
 
 ```
-app/src/main/java/com/khatibstudio/edutrackbd/
+app/src/main/java/com/khatibstudio/gpacalc/
  ├── ui/
  │    ├── splash/
  │    ├── onboarding/
