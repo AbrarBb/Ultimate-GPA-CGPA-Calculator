@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
                 AdmissionCutoff.class,
                 InstitutionPreset.class   // added in v2
         },
-        version = 3,
+        version = 4,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
