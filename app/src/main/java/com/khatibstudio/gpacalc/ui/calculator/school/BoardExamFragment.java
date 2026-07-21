@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +21,6 @@ import com.khatibstudio.gpacalc.data.model.SubjectRepository;
 import com.khatibstudio.gpacalc.databinding.FragmentBoardExamBinding;
 import com.khatibstudio.gpacalc.logic.SchoolGpaCalculator;
 import com.khatibstudio.gpacalc.ui.MainActivity;
-import com.khatibstudio.gpacalc.util.GradePointUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +29,8 @@ import java.util.Map;
 
 /**
  * Displays the auto-loaded subject list for a specific SSC/HSC group.
- * Users select grades from dropdowns — no manual subject entry.
- * Calculates GPA and navigates to the reveal screen.
+ * Users dynamically select their 3rd and 4th optional subjects using top dropdowns,
+ * which updates the grade-entry list in real time.
  */
 public class BoardExamFragment extends Fragment {
 
@@ -39,10 +39,16 @@ public class BoardExamFragment extends Fragment {
 
     private FragmentBoardExamBinding binding;
     private BoardSubjectAdapter adapter;
-    private List<SubjectDefinition> allSubjects;
+    private List<SubjectDefinition> compulsorySubjects;
     private List<SubjectDefinition> visibleSubjects;
+    private List<String> thirdOptions;
+    private List<String> fourthOptions;
+
     private String examType;
     private String group;
+
+    private String selectedThird = "";
+    private String selectedFourth = "";
 
     public static BoardExamFragment newInstance(String examType, String group) {
         BoardExamFragment fragment = new BoardExamFragment();
@@ -70,40 +76,29 @@ public class BoardExamFragment extends Fragment {
         binding.tvExamTitle.setText(examType);
         binding.tvGroupName.setText(getGroupDisplayName(group));
 
-        // Load subjects from repository
-        allSubjects = SubjectRepository.getSubjects(examType, group);
+        // Load base data
+        compulsorySubjects = SubjectRepository.getCompulsorySubjects(examType, group);
+        thirdOptions = SubjectRepository.getThirdSubjectOptions(examType, group);
+        fourthOptions = SubjectRepository.getFourthSubjectOptions(examType, group);
         visibleSubjects = new ArrayList<>();
 
-        // Initially show only compulsory subjects
-        for (SubjectDefinition sd : allSubjects) {
-            if (!sd.isOptionalFourth()) {
-                visibleSubjects.add(sd);
-            }
-        }
+        // Hide legacy toggle card (choices card replaces it)
+        binding.cardOptional.setVisibility(View.GONE);
 
-        // Check if there are optional subjects
-        boolean hasOptional = false;
-        for (SubjectDefinition sd : allSubjects) {
-            if (sd.isOptionalFourth()) {
-                hasOptional = true;
-                break;
-            }
+        // Setup choices spinners if choices are available
+        boolean hasChoices = !thirdOptions.isEmpty() || !fourthOptions.isEmpty();
+        if (hasChoices) {
+            binding.cardSubjectChoices.setVisibility(View.VISIBLE);
+            setupChoices();
+        } else {
+            binding.cardSubjectChoices.setVisibility(View.GONE);
+            rebuildVisibleSubjects();
         }
 
         // Setup RecyclerView
-        adapter = new BoardSubjectAdapter(visibleSubjects, () -> { /* no-op for now */ });
+        adapter = new BoardSubjectAdapter(visibleSubjects, () -> { /* no-op */ });
         binding.recyclerSubjects.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerSubjects.setAdapter(adapter);
-
-        // Optional subject toggle
-        if (hasOptional) {
-            binding.cardOptional.setVisibility(View.VISIBLE);
-            binding.switchOptional.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                updateVisibleSubjects(isChecked);
-            });
-        } else {
-            binding.cardOptional.setVisibility(View.GONE);
-        }
 
         // Calculate button
         binding.btnCalculate.setOnClickListener(v -> calculateGpa());
@@ -111,18 +106,88 @@ public class BoardExamFragment extends Fragment {
         // Reset button
         binding.btnReset.setOnClickListener(v -> {
             adapter.resetGrades();
-            binding.switchOptional.setChecked(false);
+            if (hasChoices) {
+                setupChoices();
+            }
         });
     }
 
-    private void updateVisibleSubjects(boolean includeOptional) {
-        visibleSubjects.clear();
-        for (SubjectDefinition sd : allSubjects) {
-            if (!sd.isOptionalFourth() || includeOptional) {
-                visibleSubjects.add(sd);
+    private void setupChoices() {
+        // --- 3rd Subject ---
+        if (!thirdOptions.isEmpty()) {
+            binding.layoutChoiceThird.setVisibility(View.VISIBLE);
+            ArrayAdapter<String> thirdAdapter = new ArrayAdapter<>(requireContext(),
+                    android.R.layout.simple_dropdown_item_1line, thirdOptions);
+            binding.spinnerChoiceThird.setAdapter(thirdAdapter);
+            binding.spinnerChoiceThird.setText(thirdOptions.get(0), false);
+            selectedThird = thirdOptions.get(0);
+
+            binding.spinnerChoiceThird.setOnItemClickListener((parent, view, position, id) -> {
+                selectedThird = thirdOptions.get(position);
+                updateFourthDropdown();
+                rebuildVisibleSubjects();
+            });
+        } else {
+            binding.layoutChoiceThird.setVisibility(View.GONE);
+            selectedThird = "";
+        }
+
+        // Initialize/Update 4th Subject options
+        updateFourthDropdown();
+        rebuildVisibleSubjects();
+    }
+
+    private void updateFourthDropdown() {
+        if (fourthOptions.isEmpty()) {
+            binding.layoutChoiceFourth.setVisibility(View.GONE);
+            selectedFourth = "";
+            return;
+        }
+
+        binding.layoutChoiceFourth.setVisibility(View.VISIBLE);
+
+        // Filter: 4th subject options cannot include the chosen 3rd subject
+        List<String> filteredFourth = new ArrayList<>();
+        for (String option : fourthOptions) {
+            if (!option.equals(selectedThird)) {
+                filteredFourth.add(option);
             }
         }
-        adapter.setSubjects(visibleSubjects);
+        filteredFourth.add("None"); // Add "None" as the first/default option
+
+        ArrayAdapter<String> fourthAdapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line, filteredFourth);
+        binding.spinnerChoiceFourth.setAdapter(fourthAdapter);
+
+        // Set default to "None" or the first filtered option
+        binding.spinnerChoiceFourth.setText("None", false);
+        selectedFourth = "None";
+
+        binding.spinnerChoiceFourth.setOnItemClickListener((parent, view, position, id) -> {
+            selectedFourth = filteredFourth.get(position);
+            rebuildVisibleSubjects();
+        });
+    }
+
+    private void rebuildVisibleSubjects() {
+        visibleSubjects.clear();
+
+        // 1. Add Compulsory core
+        visibleSubjects.addAll(compulsorySubjects);
+
+        // 2. Add Selected 3rd subject (acts as a compulsory subject point-wise)
+        if (selectedThird != null && !selectedThird.isEmpty()) {
+            visibleSubjects.add(new SubjectDefinition(selectedThird, true, false));
+        }
+
+        // 3. Add Selected 4th subject (acts as optional)
+        if (selectedFourth != null && !selectedFourth.isEmpty() && !"None".equalsIgnoreCase(selectedFourth)) {
+            visibleSubjects.add(new SubjectDefinition(selectedFourth, false, true));
+        }
+
+        if (adapter != null) {
+            adapter.setSubjects(visibleSubjects);
+        }
     }
 
     private void calculateGpa() {
@@ -172,10 +237,6 @@ public class BoardExamFragment extends Fragment {
         }
     }
 
-    /**
-     * Builds the SSC/HSC GPA 5.00 grade map inline.
-     * This is the official Bangladesh board grading scale.
-     */
     private Map<String, GradePoint> buildSscHscGradeMap() {
         Map<String, GradePoint> map = new HashMap<>();
         map.put("A+", new GradePoint(0, "A+", 5.00, 80, 100));

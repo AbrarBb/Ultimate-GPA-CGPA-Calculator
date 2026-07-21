@@ -16,6 +16,9 @@ public class Profile {
     @NonNull
     public String activeMode; // GradingScale.MODE_SCHOOL or MODE_UNIVERSITY
 
+    public String degreeType; // "Honours" / "Masters" / null
+    public String major; // e.g. "CSE", "Accounting" / null
+
     public Profile(@NonNull String name, @NonNull String activeMode) {
         this.name = name;
         this.activeMode = activeMode;

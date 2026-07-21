@@ -51,7 +51,12 @@ public class HomeFragment extends Fragment {
         viewModel.getActiveProfileId().observe(getViewLifecycleOwner(), id -> {
             Profile profile = viewModel.getActiveProfile();
             if (profile != null) {
-                binding.tvProfileName.setText(profile.name);
+                if (profile.major != null && !profile.major.isEmpty()) {
+                    String sub = (profile.degreeType != null ? profile.degreeType : "Honors") + " - " + profile.major;
+                    binding.tvProfileName.setText(profile.name + " (" + sub + ")");
+                } else {
+                    binding.tvProfileName.setText(profile.name);
+                }
             } else {
                 binding.tvProfileName.setText(R.string.no_profile_message);
             }

@@ -7,7 +7,6 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.khatibstudio.gpacalc.R;
 import com.khatibstudio.gpacalc.data.model.SubjectDefinition;
 import com.khatibstudio.gpacalc.databinding.ItemBoardSubjectBinding;
 
@@ -17,14 +16,14 @@ import java.util.Map;
 
 /**
  * RecyclerView adapter for the auto-loaded subject list.
- * Each row displays the subject name and a grade dropdown.
- * Manages a map of subject index → selected grade.
+ * Displays subject names, marks ranges in grade dropdown spinners, and point values on the right.
  */
 public class BoardSubjectAdapter extends RecyclerView.Adapter<BoardSubjectAdapter.ViewHolder> {
 
-    /** Bangladesh SSC/HSC GPA 5.00 scale */
+    /** Bangladesh SSC/HSC GPA 5.00 scale definitions */
     private static final String[] GRADES = {"A+", "A", "A-", "B", "C", "D", "F"};
     private static final double[] POINTS = {5.00, 4.00, 3.50, 3.00, 2.00, 1.00, 0.00};
+    private static final String[] MARKS  = {"80-100", "70-79", "60-69", "50-59", "40-49", "33-39", "0-32"};
 
     private List<SubjectDefinition> subjects;
     private final Map<Integer, String> selectedGrades = new HashMap<>();
@@ -33,7 +32,7 @@ public class BoardSubjectAdapter extends RecyclerView.Adapter<BoardSubjectAdapte
         void onGradeChanged();
     }
 
-    private OnGradeChangedListener listener;
+    private final OnGradeChangedListener listener;
 
     public BoardSubjectAdapter(List<SubjectDefinition> subjects, OnGradeChangedListener listener) {
         this.subjects = subjects;
@@ -46,7 +45,7 @@ public class BoardSubjectAdapter extends RecyclerView.Adapter<BoardSubjectAdapte
         notifyDataSetChanged();
     }
 
-    /** Returns a map of subject index → selected letter grade. */
+    /** Returns a map of subject index -> selected letter grade. */
     public Map<Integer, String> getSelectedGrades() {
         return new HashMap<>(selectedGrades);
     }
@@ -98,10 +97,10 @@ public class BoardSubjectAdapter extends RecyclerView.Adapter<BoardSubjectAdapte
             }
             binding.tvSubjectName.setText(displayName);
 
-            // Grade dropdown
+            // Grade dropdown showing mark range instead of point value
             String[] gradeLabels = new String[GRADES.length];
             for (int i = 0; i < GRADES.length; i++) {
-                gradeLabels[i] = GRADES[i] + " (" + String.format("%.2f", POINTS[i]) + ")";
+                gradeLabels[i] = GRADES[i] + " (" + MARKS[i] + ")";
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     binding.getRoot().getContext(),
