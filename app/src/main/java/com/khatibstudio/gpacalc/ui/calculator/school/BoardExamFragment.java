@@ -98,6 +98,7 @@ public class BoardExamFragment extends Fragment {
         // Setup RecyclerView
         adapter = new BoardSubjectAdapter(visibleSubjects, () -> { /* no-op */ });
         binding.recyclerSubjects.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerSubjects.setNestedScrollingEnabled(false);
         binding.recyclerSubjects.setAdapter(adapter);
 
         // Calculate button
