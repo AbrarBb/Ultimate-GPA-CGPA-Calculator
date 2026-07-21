@@ -38,29 +38,31 @@
                 android:textColor="?attr/colorOnSurface" />
         </LinearLayout>
 
-        <!-- Subject Choices Card -->
+        <!-- Compact Side-by-Side Subject Choices Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_subject_choices"
             style="@style/Widget.GpaCalc.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <!-- 3rd Subject Choice -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout_choice_third"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Select 3rd Subject"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:hint="3rd Subject"
                     app:boxCornerRadiusBottomEnd="8dp"
                     app:boxCornerRadiusBottomStart="8dp"
                     app:boxCornerRadiusTopEnd="8dp"
@@ -70,17 +72,20 @@
                         android:id="@+id/spinner_choice_third"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none" />
+                        android:inputType="none"
+                        android:padding="8dp"
+                        android:textSize="12sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- 4th Subject Choice -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout_choice_fourth"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Select 4th Subject (Optional)"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:hint="4th Subject"
                     app:boxCornerRadiusBottomEnd="8dp"
                     app:boxCornerRadiusBottomStart="8dp"
                     app:boxCornerRadiusTopEnd="8dp"
@@ -90,21 +95,23 @@
                         android:id="@+id/spinner_choice_fourth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none" />
+                        android:inputType="none"
+                        android:padding="8dp"
+                        android:textSize="12sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Subject List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_subjects"
+        <!-- Subject List Container (Dynamically Inflated to Avoid Nested Scroll Conflicts) -->
+        <LinearLayout
+            android:id="@+id/layout_subject_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
+            android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingBottom="8dp" />
 
-        <!-- Optional 4th Subject Toggle (Legacy) -->
+        <!-- Optional 4th Subject Toggle (Legacy - Hidden) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_optional"
             style="@style/Widget.GpaCalc.Card"
