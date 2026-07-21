@@ -11,8 +11,16 @@ public class ExamRecord {
     public static final String TYPE_HSC = "HSC";
 
     public static final String GROUP_SCIENCE = "SCIENCE";
-    public static final String GROUP_COMMERCE = "COMMERCE";
-    public static final String GROUP_ARTS = "ARTS";
+    public static final String GROUP_BUSINESS_STUDIES = "BUSINESS_STUDIES";
+    public static final String GROUP_HUMANITIES = "HUMANITIES";
+
+    // Backward-compat aliases for old constant names
+    /** @deprecated Use {@link #GROUP_BUSINESS_STUDIES} instead. */
+    @Deprecated
+    public static final String GROUP_COMMERCE = GROUP_BUSINESS_STUDIES;
+    /** @deprecated Use {@link #GROUP_HUMANITIES} instead. */
+    @Deprecated
+    public static final String GROUP_ARTS = GROUP_HUMANITIES;
 
     @PrimaryKey(autoGenerate = true)
     public int id;
@@ -21,7 +29,7 @@ public class ExamRecord {
     public String examType; // TYPE_SSC or TYPE_HSC
 
     @NonNull
-    public String group; // GROUP_SCIENCE / COMMERCE / ARTS
+    public String group; // GROUP_SCIENCE / BUSINESS_STUDIES / HUMANITIES
 
     public int scaleId;
     public int profileId;

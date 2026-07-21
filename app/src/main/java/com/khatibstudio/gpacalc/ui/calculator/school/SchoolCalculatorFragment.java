@@ -78,30 +78,8 @@ public class SchoolCalculatorFragment extends Fragment {
     }
 
     private void openExam(String examType) {
-        if (currentSummary == null) return;
-        ExamRecord record = ExamRecord.TYPE_SSC.equals(examType) ? currentSummary.ssc : currentSummary.hsc;
-        if (record == null) {
-            FormDialogHelper.showExamDialog(requireContext(), viewModel, examType, (group, scaleId) -> {
-                com.khatibstudio.gpacalc.data.entity.Profile profile = viewModel.getActiveProfile();
-                if (profile != null) {
-                    viewModel.createExamRecord(profile.id, examType, group, scaleId, () -> {
-                        ExamRecord newRecord = GpaRepository.getInstance(requireContext())
-                                .getExamByType(profile.id, examType);
-                        if (newRecord != null) {
-                            requireActivity().runOnUiThread(() -> {
-                                ExamDetailFragment fragment = ExamDetailFragment.newInstance(newRecord.id, examType);
-                                if (requireActivity() instanceof MainActivity) {
-                                    ((MainActivity) requireActivity()).switchFragment(fragment, true);
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-            return;
-        }
-        ExamDetailFragment fragment = ExamDetailFragment.newInstance(record.id, examType);
         if (requireActivity() instanceof MainActivity) {
+            BoardGroupSelectorFragment fragment = BoardGroupSelectorFragment.newInstance(examType);
             ((MainActivity) requireActivity()).switchFragment(fragment, true);
         }
     }

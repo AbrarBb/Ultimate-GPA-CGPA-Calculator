@@ -62,6 +62,10 @@ public class GpaViewModel extends AndroidViewModel {
         activeProfileId.setValue(profileId);
     }
 
+    public void updateProfile(Profile profile) {
+        repository.updateProfile(profile);
+    }
+
     public void createProfile(String name, String mode, Runnable onDone) {
         repository.insertProfile(new Profile(name, mode), id -> {
             if (PreferencesHelper.getActiveProfileId(getApplication()) <= 0) {

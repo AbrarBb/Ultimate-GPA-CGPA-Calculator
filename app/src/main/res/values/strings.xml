@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ultimate GPA/CGPA Calculator</string>
+    <string name="app_name">GPA/CGPA Calculator</string>
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
@@ -35,11 +35,15 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="calculate">Calculate</string>
+    <string name="calculate_gpa">Calculate GPA</string>
     <string name="next">Next</string>
     <string name="get_started">Get Started</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirm_delete">Delete this item?</string>
+    <string name="reset">Reset</string>
+    <string name="save_to_history">Save to History</string>
+    <string name="view_breakdown">View Breakdown</string>
 
     <!-- GPA / CGPA labels -->
     <string name="gpa">GPA</string>
@@ -51,6 +55,9 @@
     <string name="required_gpa">Required GPA</string>
     <string name="target_gpa">Target GPA</string>
     <string name="target_cgpa">Target CGPA</string>
+    <string name="your_ssc_gpa">Your SSC GPA</string>
+    <string name="your_hsc_gpa">Your HSC GPA</string>
+    <string name="gpa_reveal">GPA Result</string>
 
     <!-- School exam -->
     <string name="ssc">SSC</string>
@@ -60,12 +67,43 @@
     <string name="subject_name">Subject name</string>
     <string name="letter_grade">Letter grade</string>
     <string name="optional_fourth">Optional 4th subject</string>
+    <string name="optional_subject">Optional Subject</string>
+    <string name="optional_bonus">Optional Subject Bonus</string>
     <string name="exam_group">Group</string>
+    <string name="select_group">Select Group</string>
     <string name="group_science">Science</string>
+    <string name="group_business_studies">Business Studies</string>
+    <string name="group_humanities">Humanities</string>
     <string name="group_commerce">Commerce</string>
     <string name="group_arts">Arts</string>
     <string name="marks">Marks</string>
     <string name="enter_marks_or_grade">Enter marks or select grade</string>
+
+    <!-- Home screen education system cards -->
+    <string name="national_university">National University</string>
+    <string name="public_university">Public University</string>
+    <string name="private_university">Private University</string>
+    <string name="custom_calculator">Custom Calculator</string>
+    <string name="ssc_desc">Calculate your SSC GPA</string>
+    <string name="hsc_desc">Calculate your HSC GPA</string>
+    <string name="national_university_desc">Honours, Degree &amp; Masters</string>
+    <string name="public_university_desc">DU, BUET, RUET, KUET, CUET, SUST…</string>
+    <string name="private_university_desc">NSU, BRAC, EWU, AIUB, DIU…</string>
+    <string name="custom_calculator_desc">Your own grading scale</string>
+
+    <!-- GPA result / reveal -->
+    <string name="pass">Pass</string>
+    <string name="fail">Fail</string>
+    <string name="first_class">First Class</string>
+    <string name="total_grade_points">Total Grade Points</string>
+    <string name="highest_grade">Highest Grade</string>
+    <string name="lowest_grade">Lowest Grade</string>
+    <string name="select_grades_all">Please select grades for all required subjects.</string>
+
+    <!-- Greeting -->
+    <string name="good_morning">Good morning</string>
+    <string name="good_afternoon">Good afternoon</string>
+    <string name="good_evening">Good evening</string>
 
     <!-- University -->
     <string name="semesters">Semesters</string>
@@ -121,7 +159,7 @@
     <string name="dark_mode">Dark mode</string>
 
     <!-- Splash -->
-    <string name="splash_tagline">Bangladesh\'s #1 GPA/CGPA Calculator</string>
+    <string name="splash_tagline">Bangladesh\'s based GPA/CGPA Calculator</string>
 
     <!-- Onboarding -->
     <string name="onboard_emoji_1">🎓</string>

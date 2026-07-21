@@ -114,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateFabVisibility(Fragment fragment) {
         Profile profile = viewModel.getActiveProfile();
-        boolean showFab = fragment instanceof CalculatorHostFragment && profile != null;
+        boolean showFab = fragment instanceof CalculatorHostFragment && profile != null 
+                && GradingScale.MODE_UNIVERSITY.equals(profile.activeMode);
         binding.fabAdd.setVisibility(showFab ? View.VISIBLE : View.GONE);
     }
 

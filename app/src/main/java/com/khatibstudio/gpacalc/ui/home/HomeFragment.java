@@ -11,13 +11,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.khatibstudio.gpacalc.R;
+import com.khatibstudio.gpacalc.data.entity.ExamRecord;
 import com.khatibstudio.gpacalc.data.entity.GradingScale;
+import com.khatibstudio.gpacalc.data.entity.InstitutionPreset;
 import com.khatibstudio.gpacalc.data.entity.Profile;
 import com.khatibstudio.gpacalc.databinding.FragmentHomeBinding;
-import com.khatibstudio.gpacalc.repository.GpaRepository;
 import com.khatibstudio.gpacalc.ui.MainActivity;
+import com.khatibstudio.gpacalc.ui.calculator.school.BoardGroupSelectorFragment;
+import com.khatibstudio.gpacalc.util.PreferencesHelper;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModelFactory;
+
+import java.util.Calendar;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -38,96 +44,118 @@ public class HomeFragment extends Fragment {
                 new GpaViewModelFactory(requireActivity().getApplication()))
                 .get(GpaViewModel.class);
 
-        binding.btnGoCalculator.setOnClickListener(v -> {
-            if (requireActivity() instanceof MainActivity) {
-                ((MainActivity) requireActivity()).navigateToCalculator();
+        setupGreeting();
+        setupCardListeners();
+
+        // Update profile name when it changes
+        viewModel.getActiveProfileId().observe(getViewLifecycleOwner(), id -> {
+            Profile profile = viewModel.getActiveProfile();
+            if (profile != null) {
+                binding.tvProfileName.setText(profile.name);
+            } else {
+                binding.tvProfileName.setText(R.string.no_profile_message);
             }
         });
-        binding.btnGoAdmission.setOnClickListener(v -> {
-            if (requireActivity() instanceof MainActivity) {
-                ((MainActivity) requireActivity()).navigateToAdmission();
-            }
-        });
-        binding.cardStatistics.setOnClickListener(v -> {
-            if (requireActivity() instanceof MainActivity) {
-                ((MainActivity) requireActivity()).switchFragment(new com.khatibstudio.gpacalc.ui.statistics.StatisticsFragment(), true);
-            }
-        });
-
-        // Observe school summary (async — no main-thread DB reads)
-        viewModel.getSchoolSummaryLive().observe(getViewLifecycleOwner(),
-                this::renderSchoolSummary);
-
-        // Observe university summary (async)
-        viewModel.getUniversitySummaryLive().observe(getViewLifecycleOwner(),
-                this::renderUniversitySummary);
-
-        // Trigger reload when the active profile changes
-        viewModel.getActiveProfileId().observe(getViewLifecycleOwner(),
-                id -> refreshDashboard());
-        viewModel.getAllProfiles().observe(getViewLifecycleOwner(),
-                profiles -> refreshDashboard());
     }
 
-    private void refreshDashboard() {
+    private void setupGreeting() {
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        String greeting;
+        if (hour < 12) {
+            greeting = getString(R.string.good_morning);
+        } else if (hour < 17) {
+            greeting = getString(R.string.good_afternoon);
+        } else {
+            greeting = getString(R.string.good_evening);
+        }
+        binding.tvGreeting.setText(greeting);
+    }
+
+    private void setupCardListeners() {
+        // SSC → Group Selector
+        binding.cardSsc.setOnClickListener(v ->
+                navigateToGroupSelector(ExamRecord.TYPE_SSC));
+
+        // HSC → Group Selector
+        binding.cardHsc.setOnClickListener(v ->
+                navigateToGroupSelector(ExamRecord.TYPE_HSC));
+
+        // National University
+        binding.cardNationalUniversity.setOnClickListener(v ->
+                handleUniversitySelection("National University"));
+
+        // Public University
+        binding.cardPublicUniversity.setOnClickListener(v ->
+                handleUniversitySelection("Dhaka & Jahangirnagar University"));
+
+        // Private University (defaults to BRAC, user can select others in dropdown)
+        binding.cardPrivateUniversity.setOnClickListener(v ->
+                handleUniversitySelection("BRAC University"));
+
+        // Custom Calculator (defaults to AUST / DIU or custom)
+        binding.cardCustom.setOnClickListener(v ->
+                handleUniversitySelection("AUST / DIU"));
+    }
+
+    private void handleUniversitySelection(String presetName) {
         Profile profile = viewModel.getActiveProfile();
         if (profile == null) {
-            showEmpty();
+            if (requireActivity() instanceof MainActivity) {
+                ((MainActivity) requireActivity()).showCreateProfileDialog();
+            }
             return;
         }
-        binding.tvProfileName.setText(profile.name);
-        binding.tvProfileMode.setText(GradingScale.MODE_SCHOOL.equals(profile.activeMode)
-                ? getString(R.string.mode_school)
-                : getString(R.string.mode_university));
 
-        // Trigger async loads — results delivered via LiveData observers above
-        if (GradingScale.MODE_SCHOOL.equals(profile.activeMode)) {
-            viewModel.loadSchoolSummary(profile.id);
-        } else {
-            viewModel.loadUniversitySummary(profile.id, -1);
+        // Change mode to university
+        if (!GradingScale.MODE_UNIVERSITY.equals(profile.activeMode)) {
+            profile.activeMode = GradingScale.MODE_UNIVERSITY;
+            viewModel.updateProfile(profile);
+        }
+
+        // Find preset by name and set it active in background thread
+        com.khatibstudio.gpacalc.data.AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<InstitutionPreset> presets = viewModel.getAllPresetsSync();
+            InstitutionPreset target = null;
+            for (InstitutionPreset p : presets) {
+                if (p.name.equalsIgnoreCase(presetName) || p.name.contains(presetName)) {
+                    target = p;
+                    break;
+                }
+            }
+            if (target != null) {
+                PreferencesHelper.setActivePresetId(requireContext(), target.id);
+            }
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(this::navigateToCalculator);
+            }
+        });
+    }
+
+    private void navigateToGroupSelector(String examType) {
+        Profile profile = viewModel.getActiveProfile();
+        if (profile == null) {
+            if (requireActivity() instanceof MainActivity) {
+                ((MainActivity) requireActivity()).showCreateProfileDialog();
+            }
+            return;
+        }
+
+        // Ensure school mode is active for this profile
+        if (!GradingScale.MODE_SCHOOL.equals(profile.activeMode)) {
+            profile.activeMode = GradingScale.MODE_SCHOOL;
+            viewModel.updateProfile(profile);
+        }
+
+        if (requireActivity() instanceof MainActivity) {
+            BoardGroupSelectorFragment fragment = BoardGroupSelectorFragment.newInstance(examType);
+            ((MainActivity) requireActivity()).switchFragment(fragment, true);
         }
     }
 
-    private void showEmpty() {
-        binding.tvProfileName.setText(R.string.no_profile_title);
-        binding.tvProfileMode.setText(R.string.no_profile_message);
-        binding.tvPrimaryMetric.setText("—");
-        binding.tvSecondaryMetric.setVisibility(View.GONE);
-        binding.tvStatOne.setText("");
-        binding.tvStatTwo.setText("");
-    }
-
-    private void renderSchoolSummary(GpaRepository.SchoolSummary summary) {
-        Profile profile = viewModel.getActiveProfile();
-        if (profile == null || !GradingScale.MODE_SCHOOL.equals(profile.activeMode)) return;
-
-        binding.tvPrimaryMetricLabel.setText(R.string.gpa_with_fourth);
-        binding.tvPrimaryMetric.setText(summary.hasHsc || summary.hasSsc
-                ? String.format("%.2f", summary.hasHsc ? summary.hscGpa : summary.sscGpa)
-                : "—");
-        binding.tvSecondaryMetric.setVisibility(View.VISIBLE);
-        binding.tvSecondaryMetric.setText(getString(R.string.combined_average) + ": "
-                + (summary.hasSsc && summary.hasHsc
-                    ? String.format("%.2f", summary.combined) : "—"));
-        binding.tvStatOne.setText(getString(R.string.ssc) + ": "
-                + (summary.hasSsc ? String.format("%.2f", summary.sscGpa) : "—"));
-        binding.tvStatTwo.setText(getString(R.string.hsc) + ": "
-                + (summary.hasHsc ? String.format("%.2f", summary.hscGpa) : "—"));
-    }
-
-    private void renderUniversitySummary(GpaRepository.UniversitySummary summary) {
-        Profile profile = viewModel.getActiveProfile();
-        if (profile == null || !GradingScale.MODE_UNIVERSITY.equals(profile.activeMode)) return;
-
-        binding.tvPrimaryMetricLabel.setText(R.string.cgpa);
-        binding.tvPrimaryMetric.setText(String.format("%.2f", summary.cgpa));
-        binding.tvSecondaryMetric.setVisibility(View.VISIBLE);
-        binding.tvSecondaryMetric.setText(getString(R.string.total_credits) + ": "
-                + String.format("%.1f", summary.totalCredits));
-        binding.tvStatOne.setText(getString(R.string.total_semesters) + ": "
-                + summary.semesterCount);
-        binding.tvStatTwo.setText(getString(R.string.total_courses) + ": "
-                + summary.courseCount);
+    private void navigateToCalculator() {
+        if (requireActivity() instanceof MainActivity) {
+            ((MainActivity) requireActivity()).navigateToCalculator();
+        }
     }
 
     @Override

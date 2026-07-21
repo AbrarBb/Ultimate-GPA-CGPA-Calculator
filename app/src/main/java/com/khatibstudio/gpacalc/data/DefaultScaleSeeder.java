@@ -12,15 +12,18 @@ import java.util.List;
 /**
  * Seeds default grading scales and institution presets into a fresh database.
  *
- * DATA INTEGRITY RULES:
- * - SSC/HSC scale: verified against current (2026) Bangladesh board rules.
- * - National University scale: verified from official NU table (10 grade levels, 4.00 max).
- * - BRAC University scale: verified from bracu.ac.bd, effective Fall 2020 (13 grade levels).
- * - EWU / NSU: letter-grade entry ONLY — no officially published marks table; minMarks/maxMarks = -1.
- * - Generic UGC: fallback for DU, BUET, RUET, KUET, CUET, SUST, etc. until confirmed.
- *
- * All institution data is editable at runtime — universities revise policy and a
- * wrong hardcoded rule that can't be corrected in-app is worse than no rule at all.
+ * DATA INTEGRITY RULES (UPDATED 2026):
+ * - SSC/HSC scale: 5.00 max, official Bangladesh board rules.
+ * - National University: 10 grade levels, max 4.00.
+ * - Dhaka University / Jahangirnagar University: DU standard 4.00 scale.
+ * - BRAC University: 13 grade levels, A+/A both 4.00.
+ * - UIU: 4.00 scale, A is 90-100 (4.00).
+ * - NSU: 4.00 scale, A is 93-100 (4.00).
+ * - EWU: 4.00 scale, A+ is 80%+ (4.00).
+ * - AIUB: Corrected monotonic scale (4.00 to 2.25).
+ * - IUB: 4.00 scale, A is 90-100 (4.00).
+ * - AUST / DIU / IUBAT: UGC 4.00 scale (A+ is 80%+).
+ * - ULAB: 9 grade levels, no C- or D+ bands.
  */
 public final class DefaultScaleSeeder {
 
@@ -29,27 +32,38 @@ public final class DefaultScaleSeeder {
     public static void seed(AppDatabase db) {
         long sscHscScaleId = seedSscHscScale(db);
         long nuScaleId     = seedNationalUniversityScale(db);
+        long duScaleId     = seedDhakaUniversityScale(db);
         long bracScaleId   = seedBracScale(db);
-        long ewuScaleId    = seedEwuScale(db);
+        long uiuScaleId    = seedUiuScale(db);
         long nsuScaleId    = seedNsuScale(db);
-        long genericScaleId = seedGenericUgcScale(db);
+        long ewuScaleId    = seedEwuScale(db);
+        long aiubScaleId   = seedAiubScale(db);
+        long iubScaleId    = seedIubScale(db);
+        long austScaleId   = seedAustDiuScale(db);
+        long iubatScaleId  = seedIubatScale(db);
+        long ulabScaleId   = seedUlabScale(db);
 
         seedInstitutionPresets(db,
                 (int) nuScaleId,
+                (int) duScaleId,
                 (int) bracScaleId,
-                (int) ewuScaleId,
+                (int) uiuScaleId,
                 (int) nsuScaleId,
-                (int) genericScaleId);
+                (int) ewuScaleId,
+                (int) aiubScaleId,
+                (int) iubScaleId,
+                (int) austScaleId,
+                (int) iubatScaleId,
+                (int) ulabScaleId);
 
         seedAdmissionCutoffs(db);
     }
 
     // -------------------------------------------------------------------------
-    // 1. SSC / HSC — GPA scale 5.00 (verified, general + Dakhil boards, 2026)
+    // 1. SSC / HSC
     // -------------------------------------------------------------------------
     private static long seedSscHscScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "SSC/HSC (GPA 5.00)", GradingScale.MODE_SCHOOL, false);
+        GradingScale scale = new GradingScale("SSC/HSC (GPA 5.00)", GradingScale.MODE_SCHOOL, false);
         long id = db.gradingScaleDao().insertScale(scale);
 
         List<GradePoint> pts = new ArrayList<>();
@@ -65,13 +79,10 @@ public final class DefaultScaleSeeder {
     }
 
     // -------------------------------------------------------------------------
-    // 2. National University — verified official table (Honours/Degree/Masters)
-    //    Source: National University Bangladesh official grading policy.
-    //    10 distinct grade levels, max 4.00. Pass mark: 40 (D).
+    // 2. National University (4.00)
     // -------------------------------------------------------------------------
     private static long seedNationalUniversityScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "National University (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        GradingScale scale = new GradingScale("National University (4.00)", GradingScale.MODE_UNIVERSITY, false);
         long id = db.gradingScaleDao().insertScale(scale);
 
         List<GradePoint> pts = new ArrayList<>();
@@ -90,13 +101,32 @@ public final class DefaultScaleSeeder {
     }
 
     // -------------------------------------------------------------------------
-    // 3. BRAC University — verified from bracu.ac.bd, effective Fall 2020.
-    //    13 grade levels, A+ and A both = 4.00. Min passing CGPA: 2.00.
-    //    Marks ranges use integer boundaries (official ranges use < notation).
+    // 3. Dhaka University / Jahangirnagar University (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedDhakaUniversityScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("Dhaka / Jahangirnagar University (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 80, 100));
+        pts.add(new GradePoint((int) id, "A",  3.75, 75,  79));
+        pts.add(new GradePoint((int) id, "A-", 3.50, 70,  74));
+        pts.add(new GradePoint((int) id, "B+", 3.25, 65,  69));
+        pts.add(new GradePoint((int) id, "B",  3.00, 60,  64));
+        pts.add(new GradePoint((int) id, "B-", 2.75, 55,  59));
+        pts.add(new GradePoint((int) id, "C+", 2.50, 50,  54));
+        pts.add(new GradePoint((int) id, "C",  2.25, 45,  49));
+        pts.add(new GradePoint((int) id, "D",  2.00, 40,  44));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  39));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. BRAC University (4.00)
     // -------------------------------------------------------------------------
     private static long seedBracScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "BRAC University (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        GradingScale scale = new GradingScale("BRAC University (4.00)", GradingScale.MODE_UNIVERSITY, false);
         long id = db.gradingScaleDao().insertScale(scale);
 
         List<GradePoint> pts = new ArrayList<>();
@@ -118,92 +148,256 @@ public final class DefaultScaleSeeder {
     }
 
     // -------------------------------------------------------------------------
-    // 4. EWU — standard UGC-style 4.00 scale, letter-grade entry ONLY.
-    //    No officially published marks-to-grade table confirmed — minMarks/maxMarks = -1.
+    // 5. UIU (4.00)
     // -------------------------------------------------------------------------
-    private static long seedEwuScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "EWU (UGC 4.00)", GradingScale.MODE_UNIVERSITY, false);
+    private static long seedUiuScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("United International University (UIU)", GradingScale.MODE_UNIVERSITY, false);
         long id = db.gradingScaleDao().insertScale(scale);
-        db.gradingScaleDao().insertGradePoints(ugcLetterGradePoints((int) id));
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A",  4.00, 90, 100));
+        pts.add(new GradePoint((int) id, "A-", 3.67, 86,  89));
+        pts.add(new GradePoint((int) id, "B+", 3.33, 82,  85));
+        pts.add(new GradePoint((int) id, "B",  3.00, 78,  81));
+        pts.add(new GradePoint((int) id, "B-", 2.67, 74,  77));
+        pts.add(new GradePoint((int) id, "C+", 2.33, 70,  73));
+        pts.add(new GradePoint((int) id, "C",  2.00, 66,  69));
+        pts.add(new GradePoint((int) id, "C-", 1.67, 62,  65));
+        pts.add(new GradePoint((int) id, "D+", 1.33, 58,  61));
+        pts.add(new GradePoint((int) id, "D",  1.00, 55,  57));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  54));
+        db.gradingScaleDao().insertGradePoints(pts);
         return id;
     }
 
     // -------------------------------------------------------------------------
-    // 5. NSU — standard UGC-style 4.00 scale with +/- increments, letter-grade ONLY.
-    //    No officially published marks table confirmed — minMarks/maxMarks = -1.
+    // 6. NSU (4.00)
     // -------------------------------------------------------------------------
     private static long seedNsuScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "NSU (UGC 4.00)", GradingScale.MODE_UNIVERSITY, false);
+        GradingScale scale = new GradingScale("North South University (NSU)", GradingScale.MODE_UNIVERSITY, false);
         long id = db.gradingScaleDao().insertScale(scale);
-        db.gradingScaleDao().insertGradePoints(ugcLetterGradePoints((int) id));
-        return id;
-    }
 
-    // -------------------------------------------------------------------------
-    // 6. Generic UGC Public — fallback for DU, BUET, RUET, KUET, CUET, SUST, etc.
-    //    Use until each institution's specific rules are confirmed.
-    // -------------------------------------------------------------------------
-    private static long seedGenericUgcScale(AppDatabase db) {
-        GradingScale scale = new GradingScale(
-                "Generic Public University (UGC 4.00)", GradingScale.MODE_UNIVERSITY, false);
-        long id = db.gradingScaleDao().insertScale(scale);
-        db.gradingScaleDao().insertGradePoints(ugcLetterGradePoints((int) id));
-        return id;
-    }
-
-    /** Common UGC-style 4.00 letter-grade table (no marks ranges). */
-    private static List<GradePoint> ugcLetterGradePoints(int scaleId) {
         List<GradePoint> pts = new ArrayList<>();
-        pts.add(new GradePoint(scaleId, "A+", 4.00, -1, -1));
-        pts.add(new GradePoint(scaleId, "A",  3.75, -1, -1));
-        pts.add(new GradePoint(scaleId, "A-", 3.50, -1, -1));
-        pts.add(new GradePoint(scaleId, "B+", 3.25, -1, -1));
-        pts.add(new GradePoint(scaleId, "B",  3.00, -1, -1));
-        pts.add(new GradePoint(scaleId, "B-", 2.75, -1, -1));
-        pts.add(new GradePoint(scaleId, "C+", 2.50, -1, -1));
-        pts.add(new GradePoint(scaleId, "C",  2.25, -1, -1));
-        pts.add(new GradePoint(scaleId, "D",  2.00, -1, -1));
-        pts.add(new GradePoint(scaleId, "F",  0.00, -1, -1));
-        return pts;
+        pts.add(new GradePoint((int) id, "A",  4.00, 93, 100));
+        pts.add(new GradePoint((int) id, "A-", 3.70, 90,  92));
+        pts.add(new GradePoint((int) id, "B+", 3.30, 87,  89));
+        pts.add(new GradePoint((int) id, "B",  3.00, 83,  86));
+        pts.add(new GradePoint((int) id, "B-", 2.70, 80,  82));
+        pts.add(new GradePoint((int) id, "C+", 2.30, 77,  79));
+        pts.add(new GradePoint((int) id, "C",  2.00, 73,  76));
+        pts.add(new GradePoint((int) id, "C-", 1.70, 70,  72));
+        pts.add(new GradePoint((int) id, "D+", 1.30, 67,  69));
+        pts.add(new GradePoint((int) id, "D",  1.00, 60,  66));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  59));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
     }
 
     // -------------------------------------------------------------------------
-    // Institution presets — link scales to institution-specific rules.
-    // retakeEligibleGrades: empty = all grades eligible for retake.
+    // 7. EWU (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedEwuScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("East West University (EWU)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 80, 100));
+        pts.add(new GradePoint((int) id, "A",  3.75, 75,  79));
+        pts.add(new GradePoint((int) id, "A-", 3.50, 70,  74));
+        pts.add(new GradePoint((int) id, "B+", 3.25, 65,  69));
+        pts.add(new GradePoint((int) id, "B",  3.00, 60,  64));
+        pts.add(new GradePoint((int) id, "B-", 2.75, 55,  59));
+        pts.add(new GradePoint((int) id, "C+", 2.50, 50,  54));
+        pts.add(new GradePoint((int) id, "C",  2.25, 45,  49));
+        pts.add(new GradePoint((int) id, "D",  2.00, 40,  44));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  39));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. AIUB (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedAiubScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("AIUB (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 90, 100));
+        pts.add(new GradePoint((int) id, "A",  3.75, 85,  89));
+        pts.add(new GradePoint((int) id, "B+", 3.50, 80,  84));
+        pts.add(new GradePoint((int) id, "B",  3.25, 75,  79));
+        pts.add(new GradePoint((int) id, "C+", 3.00, 70,  74));
+        pts.add(new GradePoint((int) id, "C",  2.75, 65,  69));
+        pts.add(new GradePoint((int) id, "D+", 2.50, 60,  64));
+        pts.add(new GradePoint((int) id, "D",  2.25, 50,  59));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  49));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. IUB (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedIubScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("Independent University, Bangladesh (IUB)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A",  4.00, 90, 100));
+        pts.add(new GradePoint((int) id, "A-", 3.70, 85,  89));
+        pts.add(new GradePoint((int) id, "B+", 3.30, 80,  84));
+        pts.add(new GradePoint((int) id, "B",  3.00, 75,  79));
+        pts.add(new GradePoint((int) id, "B-", 2.70, 70,  74));
+        pts.add(new GradePoint((int) id, "C+", 2.30, 65,  69));
+        pts.add(new GradePoint((int) id, "C",  2.00, 60,  64));
+        pts.add(new GradePoint((int) id, "C-", 1.70, 55,  59));
+        pts.add(new GradePoint((int) id, "D+", 1.30, 50,  54));
+        pts.add(new GradePoint((int) id, "D",  1.00, 45,  49));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  44));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. AUST / DIU (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedAustDiuScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("AUST / DIU (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 80, 100));
+        pts.add(new GradePoint((int) id, "A",  3.75, 75,  79));
+        pts.add(new GradePoint((int) id, "A-", 3.50, 70,  74));
+        pts.add(new GradePoint((int) id, "B+", 3.25, 65,  69));
+        pts.add(new GradePoint((int) id, "B",  3.00, 60,  64));
+        pts.add(new GradePoint((int) id, "B-", 2.75, 55,  59));
+        pts.add(new GradePoint((int) id, "C+", 2.50, 50,  54));
+        pts.add(new GradePoint((int) id, "C",  2.25, 45,  49));
+        pts.add(new GradePoint((int) id, "D",  2.00, 40,  44));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  39));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. IUBAT (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedIubatScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("IUBAT (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 80, 100));
+        pts.add(new GradePoint((int) id, "A",  3.75, 75,  79));
+        pts.add(new GradePoint((int) id, "A-", 3.50, 70,  74));
+        pts.add(new GradePoint((int) id, "B+", 3.25, 65,  69));
+        pts.add(new GradePoint((int) id, "B",  3.00, 60,  64));
+        pts.add(new GradePoint((int) id, "B-", 2.75, 55,  59));
+        pts.add(new GradePoint((int) id, "C+", 2.50, 50,  54));
+        pts.add(new GradePoint((int) id, "C",  2.25, 45,  49));
+        pts.add(new GradePoint((int) id, "D",  2.00, 40,  44));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  39));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // 12. ULAB (4.00)
+    // -------------------------------------------------------------------------
+    private static long seedUlabScale(AppDatabase db) {
+        GradingScale scale = new GradingScale("ULAB (4.00)", GradingScale.MODE_UNIVERSITY, false);
+        long id = db.gradingScaleDao().insertScale(scale);
+
+        List<GradePoint> pts = new ArrayList<>();
+        pts.add(new GradePoint((int) id, "A+", 4.00, 95, 100));
+        pts.add(new GradePoint((int) id, "A",  4.00, 90,  94));
+        pts.add(new GradePoint((int) id, "A-", 3.80, 85,  89));
+        pts.add(new GradePoint((int) id, "B+", 3.30, 80,  84));
+        pts.add(new GradePoint((int) id, "B",  3.00, 75,  79));
+        pts.add(new GradePoint((int) id, "B-", 2.80, 70,  74));
+        pts.add(new GradePoint((int) id, "C+", 2.50, 65,  69));
+        pts.add(new GradePoint((int) id, "C",  2.20, 60,  64));
+        pts.add(new GradePoint((int) id, "D",  1.50, 50,  59));
+        pts.add(new GradePoint((int) id, "F",  0.00,  0,  49));
+        db.gradingScaleDao().insertGradePoints(pts);
+        return id;
+    }
+
+    // -------------------------------------------------------------------------
+    // Presets
     // -------------------------------------------------------------------------
     private static void seedInstitutionPresets(AppDatabase db,
-                                               int nuScaleId, int bracScaleId,
-                                               int ewuScaleId, int nsuScaleId,
-                                               int genericScaleId) {
+                                               int nuScaleId, int duScaleId,
+                                               int bracScaleId, int uiuScaleId,
+                                               int nsuScaleId, int ewuScaleId,
+                                               int aiubScaleId, int iubScaleId,
+                                               int austScaleId, int iubatScaleId,
+                                               int ulabScaleId) {
         List<InstitutionPreset> presets = new ArrayList<>();
 
-        // National University — REPLACE rule, year-based, supports marks entry
+        // National University
         presets.add(new InstitutionPreset(
                 "National University",
                 nuScaleId,
                 InstitutionPreset.CALC_MODE_YEAR,
                 Course.RETAKE_RULE_REPLACE,
-                "",       // all grades eligible
+                "",
                 false,
                 2.00,
-                true,     // verified marks table exists
+                true,
                 false));
 
-        // BRAC University — REPLACE rule, semester-based, supports marks entry
+        // Dhaka / Jahangirnagar
+        presets.add(new InstitutionPreset(
+                "Dhaka & Jahangirnagar University",
+                duScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE_CONDITIONAL,
+                "C+,C,D,F", // Below B- (disallowing B-)
+                false,
+                2.00,
+                true,
+                false));
+
+        // BRAC University
         presets.add(new InstitutionPreset(
                 "BRAC University",
                 bracScaleId,
                 InstitutionPreset.CALC_MODE_SEMESTER,
                 Course.RETAKE_RULE_REPLACE,
-                "",       // all grades eligible
+                "",
                 false,
                 2.00,
-                true,     // verified marks table exists
+                true,
                 false));
 
-        // EWU — REPLACE rule, semester-based, letter-grade only
+        // UIU
+        presets.add(new InstitutionPreset(
+                "United International University (UIU)",
+                uiuScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE,
+                "",
+                false,
+                2.00,
+                true,
+                false));
+
+        // NSU
+        presets.add(new InstitutionPreset(
+                "North South University (NSU)",
+                nsuScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE_CONDITIONAL,
+                "B,B-,C+,C,C-,D+,D,F",
+                true, // F requires approval
+                2.00,
+                true,
+                false));
+
+        // EWU
         presets.add(new InstitutionPreset(
                 "East West University (EWU)",
                 ewuScaleId,
@@ -212,52 +406,72 @@ public final class DefaultScaleSeeder {
                 "",
                 false,
                 2.00,
-                false,    // no verified marks table
+                true,
                 false));
 
-        // NSU — REPLACE_CONDITIONAL: only B or lower eligible; F requires approval
+        // AIUB
         presets.add(new InstitutionPreset(
-                "North South University (NSU)",
-                nsuScaleId,
-                InstitutionPreset.CALC_MODE_SEMESTER,
-                Course.RETAKE_RULE_REPLACE_CONDITIONAL,
-                "B,B-,C+,C,C-,D+,D,F",  // grades ≤ B are eligible
-                true,     // F grades need formal approval to be replaced
-                2.00,
-                false,    // no verified marks table
-                false));
-
-        // Generic Public University — REPLACE rule, semester-based, letter-grade only
-        presets.add(new InstitutionPreset(
-                "Public University (DU/BUET/RUET etc.)",
-                genericScaleId,
+                "AIUB",
+                aiubScaleId,
                 InstitutionPreset.CALC_MODE_SEMESTER,
                 Course.RETAKE_RULE_REPLACE,
                 "",
                 false,
                 2.00,
-                false,
-                true));   // editable — users should customise for their specific institution
+                true,
+                false));
 
-        // Custom — placeholder for user-created institutions
+        // IUB
         presets.add(new InstitutionPreset(
-                "Custom Institution",
-                genericScaleId,
+                "Independent University, Bangladesh (IUB)",
+                iubScaleId,
                 InstitutionPreset.CALC_MODE_SEMESTER,
                 Course.RETAKE_RULE_REPLACE,
                 "",
                 false,
                 2.00,
+                true,
+                false));
+
+        // AUST / DIU
+        presets.add(new InstitutionPreset(
+                "AUST / DIU",
+                austScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE,
+                "",
                 false,
-                true));
+                2.00,
+                true,
+                false));
+
+        // IUBAT
+        presets.add(new InstitutionPreset(
+                "IUBAT",
+                iubatScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE,
+                "",
+                false,
+                2.00,
+                true,
+                false));
+
+        // ULAB
+        presets.add(new InstitutionPreset(
+                "ULAB",
+                ulabScaleId,
+                InstitutionPreset.CALC_MODE_SEMESTER,
+                Course.RETAKE_RULE_REPLACE,
+                "",
+                false,
+                2.00,
+                true,
+                false));
 
         db.institutionPresetDao().insertPresets(presets);
     }
 
-    // -------------------------------------------------------------------------
-    // Admission cutoff seeds — editable, not hardcoded permanently.
-    // Requirements change yearly; treat this as a default starting dataset.
-    // -------------------------------------------------------------------------
     private static void seedAdmissionCutoffs(AppDatabase db) {
         List<AdmissionCutoff> cutoffs = new ArrayList<>();
         cutoffs.add(new AdmissionCutoff("University of Dhaka", "A Unit (Science)", 4.50, "SSC×5 + HSC×5"));
