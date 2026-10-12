@@ -48,11 +48,11 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🔬"
-                    android:textSize="32sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_science"
+                    android:contentDescription="@string/group_science" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -79,12 +79,12 @@
                         android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/deep_teal"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/deep_teal"
+                    android:contentDescription="@null" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -105,11 +105,11 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💼"
-                    android:textSize="32sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_private"
+                    android:contentDescription="@string/group_business_studies" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -136,12 +136,12 @@
                         android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/deep_teal"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/deep_teal"
+                    android:contentDescription="@null" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -162,11 +162,11 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📖"
-                    android:textSize="32sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_book"
+                    android:contentDescription="@string/group_humanities" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -193,12 +193,12 @@
                         android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="→"
-                    android:textColor="@color/deep_teal"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/deep_teal"
+                    android:contentDescription="@null" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

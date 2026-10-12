@@ -6,7 +6,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,9 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.khatibstudio.gpacalc.R;
+import com.khatibstudio.gpacalc.data.entity.GradingScale;
+import com.khatibstudio.gpacalc.data.entity.Profile;
 import com.khatibstudio.gpacalc.databinding.FragmentAdmissionBinding;
+import com.khatibstudio.gpacalc.util.PreferencesHelper;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModelFactory;
+
+import java.util.Locale;
 
 public class AdmissionFragment extends Fragment {
 
@@ -40,14 +44,29 @@ public class AdmissionFragment extends Fragment {
                 new GpaViewModelFactory(requireActivity().getApplication()))
                 .get(GpaViewModel.class);
 
+        setupTabs();
         setupEligibilityTab();
         setupScoreTab();
+        prefillGpaFromActiveProfile();
+    }
+
+    private void setupTabs() {
+        binding.tabLayout.removeAllTabs();
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText(R.string.admission_eligibility));
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText(R.string.admission_score));
 
         binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override public void onTabSelected(TabLayout.Tab tab) {
-                binding.layoutEligibility.setVisibility(tab.getPosition() == 0 ? View.VISIBLE : View.GONE);
-                binding.layoutScore.setVisibility(tab.getPosition() == 1 ? View.VISIBLE : View.GONE);
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    binding.layoutEligibility.setVisibility(View.VISIBLE);
+                    binding.layoutScore.setVisibility(View.GONE);
+                } else {
+                    binding.layoutEligibility.setVisibility(View.GONE);
+                    binding.layoutScore.setVisibility(View.VISIBLE);
+                }
             }
+
             @Override public void onTabUnselected(TabLayout.Tab tab) {}
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
@@ -68,9 +87,12 @@ public class AdmissionFragment extends Fragment {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable s) {
-                if (s.length() == 0) return;
+                if (s == null || s.length() == 0) {
+                    viewModel.checkEligibility(0.0);
+                    return;
+                }
                 try {
-                    double gpa = Double.parseDouble(s.toString());
+                    double gpa = Double.parseDouble(s.toString().trim());
                     viewModel.checkEligibility(gpa);
                 } catch (NumberFormatException ignored) {}
             }
@@ -80,12 +102,16 @@ public class AdmissionFragment extends Fragment {
     private void setupScoreTab() {
         binding.btnCalculateScore.setOnClickListener(v -> {
             try {
-                double ssc     = Double.parseDouble(binding.etSscGpa.getText().toString());
-                double hsc     = Double.parseDouble(binding.etHscGpa.getText().toString());
-                double written = parseOrZero(binding.etWrittenScore.getText().toString());
-                double sscW    = parseOrDefault(binding.etSscWeight.getText().toString(), 5.0);
-                double hscW    = parseOrDefault(binding.etHscWeight.getText().toString(), 5.0);
-                double wrtW    = parseOrDefault(binding.etWrittenWeight.getText().toString(), 0.0);
+                String sscStr = binding.etSscGpa.getText() != null ? binding.etSscGpa.getText().toString().trim() : "";
+                String hscStr = binding.etHscGpa.getText() != null ? binding.etHscGpa.getText().toString().trim() : "";
+                if (sscStr.isEmpty() || hscStr.isEmpty()) return;
+
+                double ssc     = Double.parseDouble(sscStr);
+                double hsc     = Double.parseDouble(hscStr);
+                double written = parseOrZero(binding.etWrittenScore.getText() != null ? binding.etWrittenScore.getText().toString().trim() : "");
+                double sscW    = parseOrDefault(binding.etSscWeight.getText() != null ? binding.etSscWeight.getText().toString().trim() : "", 5.0);
+                double hscW    = parseOrDefault(binding.etHscWeight.getText() != null ? binding.etHscWeight.getText().toString().trim() : "", 5.0);
+                double wrtW    = parseOrDefault(binding.etWrittenWeight.getText() != null ? binding.etWrittenWeight.getText().toString().trim() : "", 0.0);
                 viewModel.calculateAdmissionScore(ssc, sscW, hsc, hscW, written, wrtW);
             } catch (NumberFormatException ignored) {}
         });
@@ -94,9 +120,45 @@ public class AdmissionFragment extends Fragment {
             if (score != null) {
                 binding.tvScoreResult.setVisibility(View.VISIBLE);
                 binding.tvScoreResult.setText(
-                        getString(R.string.total_score) + ": " + String.format("%.2f", score));
+                        getString(R.string.total_score) + ": " + String.format(Locale.US, "%.2f", score));
             }
         });
+    }
+
+    private void prefillGpaFromActiveProfile() {
+        Profile profile = viewModel.getActiveProfile();
+        if (profile == null) return;
+
+        if (GradingScale.MODE_SCHOOL.equals(profile.activeMode)) {
+            viewModel.getSchoolSummaryLive().observe(getViewLifecycleOwner(), summary -> {
+                if (summary != null) {
+                    if (summary.hasSsc && binding.etSscGpa.getText() != null && binding.etSscGpa.getText().length() == 0) {
+                        binding.etSscGpa.setText(String.format(Locale.US, "%.2f", summary.sscGpa));
+                    }
+                    if (summary.hasHsc && binding.etHscGpa.getText() != null && binding.etHscGpa.getText().length() == 0) {
+                        binding.etHscGpa.setText(String.format(Locale.US, "%.2f", summary.hscGpa));
+                    }
+                    if (binding.etGpa.getText() != null && binding.etGpa.getText().length() == 0) {
+                        if (summary.hasSsc && summary.hasHsc) {
+                            binding.etGpa.setText(String.format(Locale.US, "%.2f", summary.combined));
+                        } else if (summary.hasHsc) {
+                            binding.etGpa.setText(String.format(Locale.US, "%.2f", summary.hscGpa));
+                        } else if (summary.hasSsc) {
+                            binding.etGpa.setText(String.format(Locale.US, "%.2f", summary.sscGpa));
+                        }
+                    }
+                }
+            });
+            viewModel.loadSchoolSummary(profile.id);
+        } else {
+            viewModel.getUniversitySummaryLive().observe(getViewLifecycleOwner(), summary -> {
+                if (summary != null && summary.cgpa > 0 && binding.etGpa.getText() != null && binding.etGpa.getText().length() == 0) {
+                    binding.etGpa.setText(String.format(Locale.US, "%.2f", summary.cgpa));
+                }
+            });
+            int presetId = PreferencesHelper.getActivePresetId(requireContext());
+            viewModel.loadUniversitySummary(profile.id, presetId);
+        }
     }
 
     private double parseOrZero(String s) {

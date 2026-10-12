@@ -144,6 +144,10 @@ public class GpaViewModel extends AndroidViewModel {
         repository.deleteExamRecord(record);
     }
 
+    public void saveBoardExam(int profileId, String examType, String group, int scaleId, List<Subject> subjects, Runnable onDone) {
+        repository.saveBoardExam(profileId, examType, group, scaleId, subjects, onDone);
+    }
+
     public LiveData<List<Subject>> getSubjects(int examRecordId) {
         return repository.getSubjects(examRecordId);
     }

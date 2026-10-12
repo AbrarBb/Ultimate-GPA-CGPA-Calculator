@@ -18,6 +18,7 @@ import com.khatibstudio.gpacalc.data.entity.Profile;
 import com.khatibstudio.gpacalc.databinding.FragmentUniversityCalculatorBinding;
 import com.khatibstudio.gpacalc.repository.GpaRepository;
 import com.khatibstudio.gpacalc.ui.MainActivity;
+import com.khatibstudio.gpacalc.ui.common.FormDialogHelper;
 import com.khatibstudio.gpacalc.util.PreferencesHelper;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModelFactory;
@@ -97,6 +98,15 @@ public class UniversityCalculatorFragment extends Fragment {
             binding.tvTotalCredits.setText(getString(R.string.total_credits)
                     + ": " + String.format("%.1f", summary.totalCredits));
         });
+
+        View.OnClickListener addSemesterClick = v -> {
+            Profile profile = viewModel.getActiveProfile();
+            if (profile != null) {
+                FormDialogHelper.showSemesterDialog(requireContext(), viewModel, profile.id, this::refreshData);
+            }
+        };
+        binding.btnAddSemester.setOnClickListener(addSemesterClick);
+        binding.btnAddFirstSemester.setOnClickListener(addSemesterClick);
     }
 
     private void updateRetakeLabel(InstitutionPreset preset) {
@@ -117,8 +127,13 @@ public class UniversityCalculatorFragment extends Fragment {
         Profile profile = viewModel.getActiveProfile();
         if (profile == null) return;
         viewModel.loadUniversitySummary(profile.id, activePresetId);
-        viewModel.getSemesters(profile.id).observe(getViewLifecycleOwner(), semesters ->
-                adapter.submitList(semesters, profile.id, viewModel));
+        viewModel.getSemesters(profile.id).observe(getViewLifecycleOwner(), semesters -> {
+            boolean hasSemesters = semesters != null && !semesters.isEmpty();
+            binding.layoutEmptySemesters.setVisibility(hasSemesters ? View.GONE : View.VISIBLE);
+            binding.recyclerSemesters.setVisibility(hasSemesters ? View.VISIBLE : View.GONE);
+            binding.btnAddSemester.setVisibility(hasSemesters ? View.VISIBLE : View.GONE);
+            adapter.submitList(semesters, profile.id, viewModel);
+        });
     }
 
     @Override

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.khatibstudio.gpacalc.R;
+import com.khatibstudio.gpacalc.data.AppDatabase;
 import com.khatibstudio.gpacalc.data.entity.ExamRecord;
 import com.khatibstudio.gpacalc.databinding.FragmentExamDetailBinding;
 import com.khatibstudio.gpacalc.logic.SchoolGpaCalculator;
@@ -19,6 +20,8 @@ import com.khatibstudio.gpacalc.repository.GpaRepository;
 import com.khatibstudio.gpacalc.ui.common.FormDialogHelper;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModelFactory;
+
+import java.util.Locale;
 
 public class ExamDetailFragment extends Fragment {
 
@@ -29,7 +32,7 @@ public class ExamDetailFragment extends Fragment {
     private GpaViewModel viewModel;
     private SubjectAdapter adapter;
     private int examRecordId;
-    private int scaleId;
+    private int scaleId = 1;
 
     public static ExamDetailFragment newInstance(int examRecordId, String examType) {
         ExamDetailFragment fragment = new ExamDetailFragment();
@@ -57,16 +60,21 @@ public class ExamDetailFragment extends Fragment {
         String examType = requireArguments().getString(ARG_EXAM_TYPE, ExamRecord.TYPE_SSC);
         binding.tvExamTitle.setText(examType);
 
-        ExamRecord byId = GpaRepository.getInstance(requireContext()).getExamRecordById(examRecordId);
-        scaleId = byId != null ? byId.scaleId : 1;
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            ExamRecord byId = GpaRepository.getInstance(requireContext()).getExamRecordById(examRecordId);
+            scaleId = byId != null ? byId.scaleId : 1;
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                binding.btnAddSubject.setOnClickListener(v ->
+                        FormDialogHelper.showSubjectDialog(requireContext(), viewModel, examRecordId, scaleId,
+                                this::updateLiveGpa));
+            });
+        });
 
         adapter = new SubjectAdapter(viewModel::deleteSubject);
         binding.recyclerSubjects.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerSubjects.setAdapter(adapter);
-
-        binding.btnAddSubject.setOnClickListener(v ->
-                FormDialogHelper.showSubjectDialog(requireContext(), viewModel, examRecordId, scaleId,
-                        this::updateLiveGpa));
 
         viewModel.getSubjects(examRecordId).observe(getViewLifecycleOwner(), subjects -> {
             adapter.submitList(subjects);
@@ -75,11 +83,18 @@ public class ExamDetailFragment extends Fragment {
     }
 
     private void updateLiveGpa() {
-        SchoolGpaCalculator.Result result = viewModel.calculateSchoolGpa(examRecordId);
-        binding.tvLiveGpa.setText(String.format("%.2f", result.gpaWithFourth));
-        binding.tvLiveGpaDetail.setText(getString(R.string.gpa_without_fourth) + ": "
-                + String.format("%.2f", result.gpaWithoutFourth)
-                + (result.hasFourthSubject ? "  •  4th subject bonus applied" : ""));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            SchoolGpaCalculator.Result result = viewModel.calculateSchoolGpa(examRecordId);
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (binding != null) {
+                    binding.tvLiveGpa.setText(String.format(Locale.US, "%.2f", result.gpaWithFourth));
+                    binding.tvLiveGpaDetail.setText(getString(R.string.gpa_without_fourth) + ": "
+                            + String.format(Locale.US, "%.2f", result.gpaWithoutFourth)
+                            + (result.hasFourthSubject ? "  •  4th subject bonus applied" : ""));
+                }
+            });
+        });
     }
 
     @Override

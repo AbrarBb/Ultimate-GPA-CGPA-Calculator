@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.GpaCalc" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.GpaCalc" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Brand Colors -->
         <item name="colorPrimary">@color/deep_teal</item>
         <item name="colorOnPrimary">#FFFFFF</item>
@@ -24,6 +24,10 @@
         
         <!-- Alerts -->
         <item name="colorError">@color/signal_red</item>
+        <!-- Typography – Clean modern sans-serif -->
+        <item name="android:fontFamily">sans-serif</item>
+        <!-- Default card style -->
+        <item name="materialCardViewStyle">@style/Widget.GpaCalc.Card</item>
     </style>
 
     <style name="Widget.GpaCalc.Card" parent="Widget.Material3.CardView.Elevated">
@@ -31,5 +35,12 @@
         <item name="cardElevation">2dp</item>
         <item name="contentPadding">16dp</item>
         <item name="cardBackgroundColor">@color/paper</item>
+    </style>
+    <style name="Widget.GpaCalc.GlassCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/paper</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="contentPadding">16dp</item>
     </style>
 </resources>

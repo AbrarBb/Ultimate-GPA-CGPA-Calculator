@@ -71,10 +71,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void applyTheme() {
-        if (PreferencesHelper.isDarkMode(this)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        int targetMode = PreferencesHelper.isDarkMode(this)
+                ? AppCompatDelegate.MODE_NIGHT_YES
+                : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        if (AppCompatDelegate.getDefaultNightMode() != targetMode) {
+            AppCompatDelegate.setDefaultNightMode(targetMode);
         }
     }
 
@@ -170,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
             if (f instanceof CalculatorHostFragment) {
                 ((CalculatorHostFragment) f).refreshUniversity();
             }
+            // Interstitial: fire after meaningful save — semester created
+            AdManager.getInstance().showInterstitialAfterSave(this, getApplicationContext());
         });
     }
 
@@ -179,12 +182,24 @@ public class MainActivity extends AppCompatActivity {
         switchFragment(fragment, true);
     }
 
+    public void navigateToHome() {
+        binding.bottomNav.setSelectedItemId(R.id.nav_home);
+    }
+
     public void navigateToCalculator() {
         binding.bottomNav.setSelectedItemId(R.id.nav_calculator);
     }
 
     public void navigateToAdmission() {
         binding.bottomNav.setSelectedItemId(R.id.nav_admission);
+    }
+
+    public void navigateToHistory() {
+        binding.bottomNav.setSelectedItemId(R.id.nav_history);
+    }
+
+    public void navigateToSettings() {
+        binding.bottomNav.setSelectedItemId(R.id.nav_settings);
     }
 
     public void showCreateProfileDialog() {

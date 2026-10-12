@@ -24,6 +24,8 @@
         
         <!-- Alerts -->
         <item name="colorError">@color/signal_red</item>
+        <!-- Default card style -->
+        <item name="materialCardViewStyle">@style/Widget.GpaCalc.Card</item>
     </style>
 
     <style name="Widget.GpaCalc.Card" parent="Widget.Material3.CardView.Elevated">

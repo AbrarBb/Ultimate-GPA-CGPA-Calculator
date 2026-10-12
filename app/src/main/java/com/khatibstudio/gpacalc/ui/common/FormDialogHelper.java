@@ -139,14 +139,24 @@ public final class FormDialogHelper {
                 binding.btnSave.setOnClickListener(v -> {
                     String subjectName = binding.etName.getText() != null
                             ? binding.etName.getText().toString().trim() : "";
-                    if (subjectName.isEmpty()) return;
+                    if (subjectName.isEmpty()) {
+                        binding.layoutName.setError(context.getString(R.string.error_name_required));
+                        return;
+                    }
+                    binding.layoutName.setError(null);
 
                     String grade;
                     String marksText = binding.etMarks.getText() != null
                             ? binding.etMarks.getText().toString().trim() : "";
                     if (!marksText.isEmpty()) {
                         try {
-                            grade = SchoolGpaCalculator.gradeFromMarks(Double.parseDouble(marksText), points);
+                            double marks = Double.parseDouble(marksText);
+                            if (marks < 0 || marks > 100) {
+                                binding.layoutMarks.setError(context.getString(R.string.error_marks_range));
+                                return;
+                            }
+                            binding.layoutMarks.setError(null);
+                            grade = SchoolGpaCalculator.gradeFromMarks(marks, points);
                         } catch (NumberFormatException e) {
                             grade = GradePointUtil.extractGrade(binding.etGrade.getText().toString());
                         }
@@ -186,12 +196,23 @@ public final class FormDialogHelper {
                 binding.btnSave.setOnClickListener(v -> {
                     String courseName = binding.etName.getText() != null
                             ? binding.etName.getText().toString().trim() : "";
-                    if (courseName.isEmpty()) return;
+                    if (courseName.isEmpty()) {
+                        binding.layoutName.setError(context.getString(R.string.error_name_required));
+                        return;
+                    }
+                    binding.layoutName.setError(null);
+
                     double credits = 3.0;
                     try {
                         credits = Double.parseDouble(binding.etCredits.getText().toString().trim());
                     } catch (Exception ignored) {
                     }
+                    if (credits <= 0 || credits > 10) {
+                        binding.layoutCredits.setError(context.getString(R.string.error_credits_range));
+                        return;
+                    }
+                    binding.layoutCredits.setError(null);
+
                     String grade = GradePointUtil.extractGrade(binding.etGrade.getText().toString());
                     Course course = new Course(semesterId, courseName, credits, grade,
                             binding.switchRetake.isChecked(), 0);

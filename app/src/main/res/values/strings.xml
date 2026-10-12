@@ -43,6 +43,7 @@
     <string name="confirm_delete">Delete this item?</string>
     <string name="reset">Reset</string>
     <string name="save_to_history">Save to History</string>
+    <string name="saved_to_history">Saved to History!</string>
     <string name="view_breakdown">View Breakdown</string>
 
     <!-- GPA / CGPA labels -->
@@ -155,16 +156,37 @@
     <string name="no_data">No data yet</string>
     <string name="quick_actions">Quick actions</string>
     <string name="developer">Khatib Studio</string>
-    <string name="version">Version 1.0.0</string>
     <string name="dark_mode">Dark mode</string>
+
+    <!-- Settings sections -->
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_section_support">Support</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_how_gpa_works">How GPA is calculated</string>
+    <string name="settings_rate_app">Rate this app</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_version_format">Version %s</string>
+    <string name="version">Version 1.0.0</string>
+
+    <!-- Share -->
+    <string name="share_result">Share Result</string>
+    <string name="share_result_template">My GPA Result (%1$s)\nGPA: %2$s\nCalculated with GPA/CGPA Calculator by Khatib Studio</string>
+
+    <!-- Input validation errors -->
+    <string name="error_name_required">Name cannot be empty</string>
+    <string name="error_marks_range">Marks must be between 0 and 100</string>
+    <string name="error_credits_range">Credits must be between 0.5 and 10</string>
+
+    <!-- Empty states -->
+    <string name="empty_history_title">No Calculations Saved Yet</string>
+    <string name="empty_history_desc">Calculate your SSC, HSC, or university grades and save them to track your academic progress here.</string>
+    <string name="empty_semesters_title">No Semesters Added</string>
+    <string name="empty_semesters_desc">Add your first semester to begin calculating courses and university CGPA.</string>
 
     <!-- Splash -->
     <string name="splash_tagline">Bangladesh\'s based GPA/CGPA Calculator</string>
 
     <!-- Onboarding -->
-    <string name="onboard_emoji_1">🎓</string>
-    <string name="onboard_emoji_2">📊</string>
-    <string name="onboard_emoji_3">🔒</string>
     <string name="onboard_title_1">SSC to University</string>
     <string name="onboard_title_2">All Institutions Covered</string>
     <string name="onboard_title_3">100% Private</string>

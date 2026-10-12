@@ -262,19 +262,30 @@ public class BoardExamFragment extends Fragment {
         // Calculate
         SchoolGpaCalculator.Result result = SchoolGpaCalculator.calculate(subjects, gradeMap);
 
-        // Navigate to GPA Reveal
-        navigateToReveal(result);
+        // Navigate to GPA Reveal with full subject details
+        navigateToReveal(result, subjects);
     }
 
-    private void navigateToReveal(SchoolGpaCalculator.Result result) {
+    private void navigateToReveal(SchoolGpaCalculator.Result result, List<Subject> subjects) {
         if (requireActivity() instanceof MainActivity) {
+            ArrayList<String> names = new ArrayList<>();
+            ArrayList<String> grades = new ArrayList<>();
+            boolean[] optionals = new boolean[subjects.size()];
+            for (int i = 0; i < subjects.size(); i++) {
+                Subject s = subjects.get(i);
+                names.add(s.subjectName);
+                grades.add(s.letterGrade);
+                optionals[i] = s.isOptionalFourth;
+            }
+
             GpaRevealFragment fragment = GpaRevealFragment.newInstance(
                     examType, group,
                     result.gpaWithFourth, result.gpaWithoutFourth,
                     result.hasFourthSubject, result.isFailed,
                     result.totalSubjects, result.compulsoryCount,
                     result.optionalBonus,
-                    result.highestGrade, result.lowestGrade);
+                    result.highestGrade, result.lowestGrade,
+                    names, grades, optionals);
             ((MainActivity) requireActivity()).switchFragment(fragment, true);
         }
     }

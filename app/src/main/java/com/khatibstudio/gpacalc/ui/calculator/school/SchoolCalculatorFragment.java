@@ -68,7 +68,6 @@ public class SchoolCalculatorFragment extends Fragment {
         });
 
         viewModel.getActiveProfileId().observe(getViewLifecycleOwner(), id -> refreshSummary());
-        refreshSummary();
     }
 
     private void refreshSummary() {

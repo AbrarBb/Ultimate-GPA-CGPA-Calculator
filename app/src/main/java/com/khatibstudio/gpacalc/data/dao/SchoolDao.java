@@ -47,4 +47,9 @@ public interface SchoolDao {
 
     @Query("SELECT * FROM subject WHERE examRecordId = :examRecordId ORDER BY id ASC")
     List<Subject> getSubjectsForExamSync(int examRecordId);
+
+    @Query("DELETE FROM subject WHERE examRecordId = :examRecordId")
+    void deleteSubjectsForExam(int examRecordId);
 }
+
+

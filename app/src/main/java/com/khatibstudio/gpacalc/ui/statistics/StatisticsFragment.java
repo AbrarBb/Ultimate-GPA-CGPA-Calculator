@@ -20,6 +20,7 @@ import com.khatibstudio.gpacalc.R;
 import com.khatibstudio.gpacalc.data.entity.GradingScale;
 import com.khatibstudio.gpacalc.data.entity.Profile;
 import com.khatibstudio.gpacalc.databinding.FragmentStatisticsBinding;
+import com.khatibstudio.gpacalc.ads.AdManager;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
 import com.khatibstudio.gpacalc.viewmodel.GpaViewModelFactory;
 
@@ -46,6 +47,9 @@ public class StatisticsFragment extends Fragment {
                 .get(GpaViewModel.class);
 
         setupChart();
+
+        // Banner ad — Statistics (passive viewing screen)
+        AdManager.getInstance().loadBanner(requireContext(), binding.adBannerStatistics);
 
         viewModel.getActiveProfileId().observe(getViewLifecycleOwner(), id -> {
             if (id != null && id > 0) loadStats(id);

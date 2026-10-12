@@ -19,8 +19,8 @@ public class OnboardingActivity extends AppCompatActivity {
 
     private ActivityOnboardingBinding binding;
 
-    // Page data: emoji, title res, description res
-    private static final int[] EMOJIS    = { R.string.onboard_emoji_1, R.string.onboard_emoji_2, R.string.onboard_emoji_3 };
+    // Page data: icon res, title res, description res
+    private static final int[] ICONS     = { R.drawable.ic_school, R.drawable.ic_analytics, R.drawable.ic_privacy };
     private static final int[] TITLES    = { R.string.onboard_title_1, R.string.onboard_title_2, R.string.onboard_title_3 };
     private static final int[] DESCS     = { R.string.onboard_desc_1,  R.string.onboard_desc_2,  R.string.onboard_desc_3  };
 
@@ -30,7 +30,7 @@ public class OnboardingActivity extends AppCompatActivity {
         binding = ActivityOnboardingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        OnboardingPagerAdapter adapter = new OnboardingPagerAdapter(EMOJIS, TITLES, DESCS);
+        OnboardingPagerAdapter adapter = new OnboardingPagerAdapter(ICONS, TITLES, DESCS);
         binding.viewPager.setAdapter(adapter);
 
         // Wire dot indicators to ViewPager2

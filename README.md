@@ -1,5 +1,39 @@
-# Ultimate GPA/CGPA Calculator
-## GPA/CGPA Calculator for Bangladesh
+<div align="center">
+  <img src="app_Icon.png" width="128" height="128" alt="Ultimate GPA/CGPA Calculator App Logo" />
+  <h1>Ultimate GPA/CGPA Calculator</h1>
+  <p><b>The most complete, offline-first academic companion app for Bangladeshi students.</b></p>
+  <p>Covering SSC, HSC, National University, Public Universities (DU, BUET, RUET, etc.), and Private Universities (NSU, BRAC, EWU, AIUB, etc.) in a unified, modern Material 3 interface.</p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
+    <img src="https://img.shields.io/badge/Min_SDK-26_(Android_8.0+)-0284C7?style=for-the-badge" alt="Min SDK" />
+    <img src="https://img.shields.io/badge/Target_SDK-35-0D9488?style=for-the-badge" alt="Target SDK" />
+    <img src="https://img.shields.io/badge/Language-Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
+    <img src="https://img.shields.io/badge/Architecture-MVVM-6366F1?style=for-the-badge" alt="MVVM" />
+    <img src="https://img.shields.io/badge/Database-Room_SQLite-38BDF8?style=for-the-badge&logo=sqlite&logoColor=white" alt="Room" />
+    <img src="https://img.shields.io/badge/Offline-100%25-10B981?style=for-the-badge" alt="Offline" />
+    <img src="https://img.shields.io/badge/Theme-Material_3_Day%2FNight-8B5CF6?style=for-the-badge" alt="Material 3" />
+  </p>
+</div>
+
+---
+
+## 📱 App Screenshots & Visual Tour
+
+| 🏠 Home Dashboard | 🔬 SSC/HSC Stream Selection | 📝 Board Exam Calculator |
+|:---:|:---:|:---:|
+| <img src="Screenshots/01_home_screen.png" width="250" alt="Home Dashboard" /> | <img src="Screenshots/02_group_selection.png" width="250" alt="Group Selection" /> | <img src="Screenshots/03_board_exam_calculator.png" width="250" alt="Board Exam Calculator" /> |
+| *Personalized greeting, academic categories, and clean Material 3 vector iconography* | *Science, Business Studies, and Humanities preloaded subject templates* | *Automatic 4th subject bonus points and live grade point resolution* |
+
+| 🎓 University CGPA Engine | 🎯 Target GPA & Course Planner | 🏛️ Admission Eligibility Checker |
+|:---:|:---:|:---:|
+| <img src="Screenshots/04_university_calculator.png" width="250" alt="University CGPA Engine" /> | <img src="Screenshots/05_target_gpa_planner.png" width="250" alt="Target GPA Planner" /> | <img src="Screenshots/06_admission_eligibility.png" width="250" alt="Admission Eligibility Checker" /> |
+| *Semester credit weighting and institution-specific retake rules* | *Calculates exact required GPA in future semesters to reach dream CGPA* | *Pre-checks eligibility against BUET, Medical, DU, and public/private cutoffs* |
+
+| 📜 Offline History & Records | ⚙️ Settings & System Guide |
+|:---:|:---:|
+| <img src="Screenshots/07_history_screen.png" width="250" alt="Offline History" /> | <img src="Screenshots/08_settings_screen.png" width="250" alt="Settings & Preferences" /> |
+| *100% offline persistence with Room SQLite database for transcript history* | *Dark mode toggle, profile management, and verified grading formula guides* |
 
 ---
 
@@ -42,7 +76,7 @@ in this category — not by having the most features on day one.
 | Architecture | MVVM |
 | Database | Room (SQLite) |
 | Min SDK | Android 8.0 (API 26) |
-| Target SDK | Latest stable |
+| Target SDK | Android 15 (API 35) |
 | UI | Material Design 3, XML layouts |
 | Dark Mode | Yes, full support |
 | Offline | 100% — no backend required for core features |
@@ -302,51 +336,17 @@ app/src/main/java/com/khatibstudio/gpacalc/
 ## 11. UI / DESIGN SYSTEM
 
 - Style: Material 3, rounded corners, soft shadows, generous white space, minimal/premium feel — not a "typical calculator app" look
-- Colors: Primary `#2563EB`, Secondary `#0EA5E9`, Success `#10B981`, Warning `#F59E0B`, Danger `#EF4444`, Background `#F8FAFC`, Dark `#111827`
-- Typography: Inter or Google Sans, large titles, rounded buttons
-- Dashboard: greeting + current CGPA with progress bar + credits completed/remaining, quick actions (Add Semester / Add SSC / Add HSC / Admission / Calculator), statistics summary, recent activity feed
-- Navigation: bottom nav (Home, Calculator, Admission, History, Settings) + center FAB for quick-add (Semester / SSC / HSC / Profile)
-- Animations: splash, card expansion, counter/progress animation on GPA reveal — kept subtle, not gimmicky
+- Colors: Deep Teal `#006A60`, Sun Gold `#FFB703`, Signal Green `#2A9D8F`, Signal Red `#E76F51`, Paper `#FBFDFA`, Ink `#191C1B`
+- Typography: Roboto / System Sans, clear hierarchy, high-contrast labels
+- Navigation: 5-tab bottom navigation (Home, Calculator, Admission, History, Settings) + Floating Action Button for quick record creation
+- Visual Polish: Custom vector drawables for every category (no emojis), smooth card elevation, accessible touch targets, and full Day/Night theme pairing
 
 ---
 
-## 12. PHASED ROADMAP (realistic solo-dev pacing)
-
-### Phase 1 — MVP (4–6 weeks)
-- Splash, onboarding, single profile creation
-- School GPA (SSC/HSC) with/without 4th subject, combined average
-- University GPA/CGPA — EWU, NSU, BRAC, National University, generic UGC presets
-- Save/edit/delete, Room persistence
-- Target CGPA calculator
-- Material 3 UI, dark mode
-- AdMob banner + capped interstitial
-- Bangla localization for core screens only
-
-### Phase 2
-- Multi-profile support
-- Admission eligibility checker + scholarship/dean's-list checker (shared threshold engine)
-- Scenario calculator (what-if + pass-mark merged module)
-- Statistics dashboard + trend charts
-- Result/notification reminders (WorkManager)
-
-### Phase 3
-- PDF/image transcript export
-- JSON backup/restore
-- Full-app Bangla localization
-- Home screen widget
-
-### Phase 4 (validate demand before building)
-- Cloud sync
-- OCR transcript import
-- AI-powered study/GPA-improvement suggestions
-- Premium subscription (ad removal, unlimited profiles/exports)
-
----
-
-## 13. KEY PRINCIPLES TO ENFORCE THROUGHOUT
+## 12. KEY PRINCIPLES TO ENFORCE THROUGHOUT
 
 1. Grade data **never leaves the device** unless the user explicitly exports/shares it — market this as a trust feature.
 2. Institution grading rules and admission cutoffs are **editable local datasets**, not hardcoded constants — they will need updates without app-store releases.
 3. Never fabricate a marks-to-grade table for an institution without a verified official source (EWU, NSU currently excluded from marks-entry for this reason).
 4. Ads must never sit between the user and seeing their calculated result.
-5. Ship Phase 1 narrow and solid rather than wide and half-finished — validate before building National University, widgets, OCR, or AI features.
+5. 100% calculation accuracy adhering to official Bangladeshi education board & university grading guidelines.

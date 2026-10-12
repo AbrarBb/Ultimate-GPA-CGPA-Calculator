@@ -11,12 +11,12 @@ import com.khatibstudio.gpacalc.databinding.ItemOnboardingPageBinding;
 public class OnboardingPagerAdapter
         extends RecyclerView.Adapter<OnboardingPagerAdapter.PageViewHolder> {
 
-    private final int[] emojis;
+    private final int[] iconResIds;
     private final int[] titles;
     private final int[] descriptions;
 
-    public OnboardingPagerAdapter(int[] emojis, int[] titles, int[] descriptions) {
-        this.emojis       = emojis;
+    public OnboardingPagerAdapter(int[] iconResIds, int[] titles, int[] descriptions) {
+        this.iconResIds   = iconResIds;
         this.titles       = titles;
         this.descriptions = descriptions;
     }
@@ -30,7 +30,7 @@ public class OnboardingPagerAdapter
 
     @Override
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
-        holder.binding.tvEmoji.setText(emojis[position]);
+        holder.binding.ivIcon.setImageResource(iconResIds[position]);
         holder.binding.tvTitle.setText(titles[position]);
         holder.binding.tvDescription.setText(descriptions[position]);
     }

@@ -194,10 +194,15 @@ public final class UniversityGpaCalculator {
                 }
 
                 case Course.RETAKE_RULE_AVERAGE: {
-                    // Average all attempts into one synthetic entry
+                    // Average original attempt + all retake attempts into one synthetic entry
                     double pointSum = 0;
                     int count = 0;
-                    double credits = attempts.get(0).creditHours;
+                    Course original = idToCourse.get(entry.getKey());
+                    if (original != null) {
+                        GradePoint ogp = gradeToPointMap.get(original.letterGrade);
+                        if (ogp != null) { pointSum += ogp.pointValue; count++; }
+                    }
+                    double credits = (original != null) ? original.creditHours : attempts.get(0).creditHours;
                     for (Course c : attempts) {
                         GradePoint gp = gradeToPointMap.get(c.letterGrade);
                         if (gp != null) { pointSum += gp.pointValue; count++; }
@@ -206,8 +211,8 @@ public final class UniversityGpaCalculator {
                         String syntheticGrade = closestGradeForPoint(
                                 pointSum / count, gradeToPointMap);
                         Course synthetic = new Course(
-                                attempts.get(0).semesterId,
-                                attempts.get(0).courseName,
+                                (original != null) ? original.semesterId : attempts.get(0).semesterId,
+                                (original != null) ? original.courseName : attempts.get(0).courseName,
                                 credits, syntheticGrade, false, 0);
                         result.add(synthetic);
                     }

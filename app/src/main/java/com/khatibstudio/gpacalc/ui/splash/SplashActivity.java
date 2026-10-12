@@ -24,11 +24,11 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Apply theme before super.onCreate
-        if (PreferencesHelper.isDarkMode(this)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        int targetMode = PreferencesHelper.isDarkMode(this)
+                ? AppCompatDelegate.MODE_NIGHT_YES
+                : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        if (AppCompatDelegate.getDefaultNightMode() != targetMode) {
+            AppCompatDelegate.setDefaultNightMode(targetMode);
         }
         super.onCreate(savedInstanceState);
         ActivitySplashBinding binding = ActivitySplashBinding.inflate(getLayoutInflater());

@@ -35,13 +35,18 @@
     <string name="delete">মুছুন</string>
     <string name="edit">সম্পাদনা</string>
     <string name="calculate">হিসাব করুন</string>
+    <string name="calculate_gpa">জিপিএ হিসাব করুন</string>
     <string name="next">পরবর্তী</string>
     <string name="get_started">শুরু করুন</string>
     <string name="yes">হ্যাঁ</string>
     <string name="no">না</string>
     <string name="confirm_delete">এই আইটেম মুছবেন?</string>
+    <string name="reset">রিসেট</string>
+    <string name="save_to_history">ইতিহাসে সংরক্ষণ করুন</string>
+    <string name="saved_to_history">ইতিহাসে সংরক্ষিত হয়েছে!</string>
+    <string name="view_breakdown">বিস্তারিত দেখুন</string>
 
-    <!-- GPA labels -->
+    <!-- GPA / CGPA labels -->
     <string name="gpa">জিপিএ</string>
     <string name="cgpa">সিজিপিএ</string>
     <string name="gpa_without_fourth">জিপিএ (৪র্থ ছাড়া)</string>
@@ -51,8 +56,11 @@
     <string name="required_gpa">প্রয়োজনীয় জিপিএ</string>
     <string name="target_gpa">লক্ষ্য জিপিএ</string>
     <string name="target_cgpa">লক্ষ্য সিজিপিএ</string>
+    <string name="your_ssc_gpa">আপনার SSC জিপিএ</string>
+    <string name="your_hsc_gpa">আপনার HSC জিপিএ</string>
+    <string name="gpa_reveal">জিপিএ ফলাফল</string>
 
-    <!-- School -->
+    <!-- School exam -->
     <string name="ssc">SSC</string>
     <string name="hsc">HSC</string>
     <string name="subjects">বিষয়সমূহ</string>
@@ -60,11 +68,43 @@
     <string name="subject_name">বিষয়ের নাম</string>
     <string name="letter_grade">গ্রেড</string>
     <string name="optional_fourth">ঐচ্ছিক ৪র্থ বিষয়</string>
-    <string name="marks">নম্বর</string>
-    <string name="enter_marks_or_grade">নম্বর লিখুন অথবা গ্রেড নির্বাচন করুন</string>
+    <string name="optional_subject">ঐচ্ছিক বিষয়</string>
+    <string name="optional_bonus">ঐচ্ছিক বিষয়ের বোনাস</string>
+    <string name="exam_group">গ্রুপ</string>
+    <string name="select_group">গ্রুপ নির্বাচন করুন</string>
     <string name="group_science">বিজ্ঞান</string>
+    <string name="group_business_studies">ব্যবসায় শিক্ষা</string>
+    <string name="group_humanities">মানবিক</string>
     <string name="group_commerce">ব্যবসায় শিক্ষা</string>
     <string name="group_arts">মানবিক</string>
+    <string name="marks">নম্বর</string>
+    <string name="enter_marks_or_grade">নম্বর লিখুন অথবা গ্রেড নির্বাচন করুন</string>
+
+    <!-- Home screen education system cards -->
+    <string name="national_university">জাতীয় বিশ্ববিদ্যালয়</string>
+    <string name="public_university">পাবলিক বিশ্ববিদ্যালয়</string>
+    <string name="private_university">বেসরকারি বিশ্ববিদ্যালয়</string>
+    <string name="custom_calculator">কাস্টম ক্যালকুলেটর</string>
+    <string name="ssc_desc">আপনার SSC জিপিএ হিসাব করুন</string>
+    <string name="hsc_desc">আপনার HSC জিপিএ হিসাব করুন</string>
+    <string name="national_university_desc">অনার্স, ডিগ্রি এবং মাস্টার্স</string>
+    <string name="public_university_desc">ঢাবি, বুয়েট, রুয়েট, কুয়েট, চুয়েট, সাস্ট…</string>
+    <string name="private_university_desc">এনএসইউ, ব্র্যাক, ইডব্লিউইউ, এআইইউবি, ডিআইইউ…</string>
+    <string name="custom_calculator_desc">আপনার নিজস্ব গ্রেডিং স্কেল</string>
+
+    <!-- GPA result / reveal -->
+    <string name="pass">পাস</string>
+    <string name="fail">ফেল</string>
+    <string name="first_class">ফার্স্ট ক্লাস</string>
+    <string name="total_grade_points">মোট গ্রেড পয়েন্ট</string>
+    <string name="highest_grade">সর্বোচ্চ গ্রেড</string>
+    <string name="lowest_grade">সর্বনিম্ন গ্রেড</string>
+    <string name="select_grades_all">দয়া করে সকল আবশ্যিক বিষয়ের গ্রেড নির্বাচন করুন।</string>
+
+    <!-- Greeting -->
+    <string name="good_morning">শুভ সকাল</string>
+    <string name="good_afternoon">শুভ অপরাহ্ন</string>
+    <string name="good_evening">শুভ সন্ধ্যা</string>
 
     <!-- University -->
     <string name="semesters">সেমিস্টারসমূহ</string>
@@ -75,16 +115,26 @@
     <string name="course_name">কোর্সের নাম</string>
     <string name="credit_hours">ক্রেডিট ঘণ্টা</string>
     <string name="retake">পুনরায় পরীক্ষা</string>
+    <string name="retake_rule">পুনরায় পরীক্ষার নিয়ম</string>
+    <string name="retake_replace">পুরোনো গ্রেড প্রতিস্থাপন</string>
+    <string name="retake_average">গড় ফলাফল</string>
     <string name="institution">প্রতিষ্ঠান</string>
     <string name="remaining_credits">অবশিষ্ট ক্রেডিট</string>
     <string name="retake_count">পুনরায় পরীক্ষা</string>
+
+    <!-- Grading -->
+    <string name="grading_scale">গ্রেডিং স্কেল</string>
+    <string name="select_scale">গ্রেডিং স্কেল নির্বাচন করুন</string>
 
     <!-- Admission -->
     <string name="admission_eligibility">ভর্তি যোগ্যতা যাচাই</string>
     <string name="your_gpa">আপনার জিপিএ / সিজিপিএ</string>
     <string name="eligible_programs">যোগ্য প্রোগ্রামসমূহ</string>
     <string name="admission_score">ভর্তি স্কোর ক্যালকুলেটর</string>
+    <string name="ssc_weight">SSC ওয়েট</string>
+    <string name="hsc_weight">HSC ওয়েট</string>
     <string name="written_test_score">লিখিত পরীক্ষার নম্বর</string>
+    <string name="written_test_weight">লিখিত পরীক্ষার ওয়েট</string>
     <string name="total_score">মোট স্কোর</string>
 
     <!-- Statistics -->
@@ -94,25 +144,31 @@
     <string name="average_gpa">গড় জিপিএ</string>
     <string name="gpa_trend">জিপিএ প্রবণতা</string>
 
-    <!-- Misc -->
+    <!-- Home stats -->
     <string name="total_subjects">মোট বিষয়</string>
     <string name="total_courses">মোট কোর্স</string>
     <string name="total_semesters">মোট সেমিস্টার</string>
     <string name="total_credits">মোট ক্রেডিট</string>
+
+    <!-- History / misc -->
     <string name="history">ইতিহাস</string>
     <string name="settings">সেটিংস</string>
     <string name="no_data">এখনও কোনো ডেটা নেই</string>
+    <string name="quick_actions">দ্রুত পদক্ষেপ</string>
     <string name="developer">Khatib Studio</string>
     <string name="version">সংস্করণ ১.০.০</string>
     <string name="dark_mode">ডার্ক মোড</string>
+
+    <!-- Empty states -->
+    <string name="empty_history_title">এখনও কোনো হিসাব সংরক্ষিত নেই</string>
+    <string name="empty_history_desc">আপনার SSC, HSC বা বিশ্ববিদ্যালয়ের গ্রেড হিসাব করে এখানে সংরক্ষণ করুন।</string>
+    <string name="empty_semesters_title">কোনো সেমিস্টার যোগ করা হয়নি</string>
+    <string name="empty_semesters_desc">কোর্স এবং বিশ্ববিদ্যালয়ের সিজিপিএ হিসাব করতে প্রথম সেমিস্টার যোগ করুন।</string>
 
     <!-- Splash -->
     <string name="splash_tagline">বাংলাদেশের #১ জিপিএ/সিজিপিএ ক্যালকুলেটর</string>
 
     <!-- Onboarding -->
-    <string name="onboard_emoji_1">🎓</string>
-    <string name="onboard_emoji_2">📊</string>
-    <string name="onboard_emoji_3">🔒</string>
     <string name="onboard_title_1">SSC থেকে বিশ্ববিদ্যালয়</string>
     <string name="onboard_title_2">সব প্রতিষ্ঠান সমর্থিত</string>
     <string name="onboard_title_3">১০০% গোপনীয়</string>

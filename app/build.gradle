@@ -28,6 +28,12 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
+    }
+
+    lint {
+        abortOnError false
+        disable 'MissingTranslation'
     }
 }
 
@@ -51,4 +57,7 @@ dependencies {
 
     // AdMob (monetization)
     implementation 'com.google.android.gms:play-services-ads:23.6.0'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
 }

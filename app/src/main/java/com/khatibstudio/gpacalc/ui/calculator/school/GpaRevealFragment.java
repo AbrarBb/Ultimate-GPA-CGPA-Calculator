@@ -1,12 +1,14 @@
 package com.khatibstudio.gpacalc.ui.calculator.school;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,13 +16,24 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.khatibstudio.gpacalc.R;
+import com.khatibstudio.gpacalc.ads.AdManager;
+import com.khatibstudio.gpacalc.data.entity.Profile;
+import com.khatibstudio.gpacalc.data.entity.Subject;
 import com.khatibstudio.gpacalc.databinding.FragmentGpaRevealBinding;
 import com.khatibstudio.gpacalc.ui.MainActivity;
+import com.khatibstudio.gpacalc.ui.history.HistoryFragment;
+import com.khatibstudio.gpacalc.ui.home.HomeFragment;
+import com.khatibstudio.gpacalc.viewmodel.GpaViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Centered GPA reveal screen.
  * Displays a large GPA number with a count-up animation (the signature moment),
  * pass/fail status pills, and detailed breakdown metadata.
+ * Persists exam record and subjects into Room database on "Save to History".
  */
 public class GpaRevealFragment extends Fragment {
 
@@ -35,6 +48,9 @@ public class GpaRevealFragment extends Fragment {
     private static final String ARG_OPTIONAL_BONUS = "optional_bonus";
     private static final String ARG_HIGHEST_GRADE = "highest_grade";
     private static final String ARG_LOWEST_GRADE = "lowest_grade";
+    private static final String ARG_SUBJECT_NAMES = "subject_names";
+    private static final String ARG_SUBJECT_GRADES = "subject_grades";
+    private static final String ARG_SUBJECT_OPTIONALS = "subject_optionals";
 
     private FragmentGpaRevealBinding binding;
 
@@ -43,7 +59,10 @@ public class GpaRevealFragment extends Fragment {
                                                 boolean hasFourth, boolean isFailed,
                                                 int totalSubjects, int compulsoryCount,
                                                 double optionalBonus,
-                                                String highestGrade, String lowestGrade) {
+                                                String highestGrade, String lowestGrade,
+                                                ArrayList<String> subjectNames,
+                                                ArrayList<String> subjectGrades,
+                                                boolean[] subjectOptionals) {
         GpaRevealFragment fragment = new GpaRevealFragment();
         Bundle args = new Bundle();
         args.putString(ARG_EXAM_TYPE, examType);
@@ -57,6 +76,9 @@ public class GpaRevealFragment extends Fragment {
         args.putDouble(ARG_OPTIONAL_BONUS, optionalBonus);
         args.putString(ARG_HIGHEST_GRADE, highestGrade);
         args.putString(ARG_LOWEST_GRADE, lowestGrade);
+        args.putStringArrayList(ARG_SUBJECT_NAMES, subjectNames);
+        args.putStringArrayList(ARG_SUBJECT_GRADES, subjectGrades);
+        args.putBooleanArray(ARG_SUBJECT_OPTIONALS, subjectOptionals);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,7 +94,8 @@ public class GpaRevealFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Bundle args = requireArguments();
-        String examType = args.getString(ARG_EXAM_TYPE);
+        String examType = args.getString(ARG_EXAM_TYPE, "");
+        String group = args.getString(ARG_GROUP, "");
         double gpaWithFourth = args.getDouble(ARG_GPA_WITH_FOURTH);
         double gpaWithoutFourth = args.getDouble(ARG_GPA_WITHOUT_FOURTH);
         boolean isFailed = args.getBoolean(ARG_IS_FAILED);
@@ -93,7 +116,7 @@ public class GpaRevealFragment extends Fragment {
 
         // Subtext / detailed GPA
         if (args.getBoolean(ARG_HAS_FOURTH)) {
-            binding.tvGpaWithoutFourth.setText(getString(R.string.gpa_without_fourth) + ": " + String.format("%.2f", gpaWithoutFourth));
+            binding.tvGpaWithoutFourth.setText(getString(R.string.gpa_without_fourth) + ": " + String.format(Locale.US, "%.2f", gpaWithoutFourth));
             binding.tvGpaWithoutFourth.setVisibility(View.VISIBLE);
         } else {
             binding.tvGpaWithoutFourth.setVisibility(View.GONE);
@@ -102,24 +125,61 @@ public class GpaRevealFragment extends Fragment {
         // Metadata grid values
         binding.tvTotalSubjects.setText(String.valueOf(args.getInt(ARG_TOTAL_SUBJECTS)));
         double bonus = args.getDouble(ARG_OPTIONAL_BONUS);
-        binding.tvOptionalBonus.setText(bonus > 0 ? "+" + String.format("%.2f", bonus) : "—");
-        binding.tvHighestGrade.setText(args.getString(ARG_HIGHEST_GRADE));
-        binding.tvLowestGrade.setText(args.getString(ARG_LOWEST_GRADE));
+        binding.tvOptionalBonus.setText(bonus > 0 ? "+" + String.format(Locale.US, "%.2f", bonus) : "—");
+        binding.tvHighestGrade.setText(args.getString(ARG_HIGHEST_GRADE, "—"));
+        binding.tvLowestGrade.setText(args.getString(ARG_LOWEST_GRADE, "—"));
 
         // GPA Count-up Animation
         animateGpa(isFailed ? 0.0 : gpaWithFourth);
 
-        // Save to History button (for now just takes user back to home/history, can be extended to save record)
+        // Save to History button — saves to DB, then shows interstitial, then navigates to History
         binding.btnSaveHistory.setOnClickListener(v -> {
-            if (requireActivity() instanceof MainActivity) {
-                ((MainActivity) requireActivity()).switchFragment(new com.khatibstudio.gpacalc.ui.home.HomeFragment(), false);
+            MainActivity activity = (requireActivity() instanceof MainActivity) ? (MainActivity) requireActivity() : null;
+            if (activity != null) {
+                GpaViewModel vm = activity.getSharedViewModel();
+                Profile activeProfile = vm.getActiveProfile();
+                if (activeProfile != null) {
+                    List<Subject> subjectsToSave = new ArrayList<>();
+                    ArrayList<String> names = args.getStringArrayList(ARG_SUBJECT_NAMES);
+                    ArrayList<String> grades = args.getStringArrayList(ARG_SUBJECT_GRADES);
+                    boolean[] optionals = args.getBooleanArray(ARG_SUBJECT_OPTIONALS);
+                    if (names != null && grades != null && optionals != null) {
+                        for (int i = 0; i < names.size(); i++) {
+                            subjectsToSave.add(new Subject(0, names.get(i), grades.get(i), optionals[i]));
+                        }
+                    }
+                    vm.saveBoardExam(activeProfile.id, examType, group, 1, subjectsToSave, () -> {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (getContext() != null) {
+                                    Toast.makeText(getContext(), R.string.saved_to_history, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }
+                AdManager.getInstance().showInterstitialAfterSave(activity, activity.getApplicationContext());
+                activity.switchFragment(new HistoryFragment(), false);
             }
         });
 
-        // Go home button
+        // Share Result button — native Android share sheet
+        binding.btnShare.setOnClickListener(v -> {
+            String gpaText = String.format(Locale.US, "%.2f", isFailed ? 0.0 : gpaWithFourth);
+            String shareText = getString(R.string.share_result_template, examType, gpaText);
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_result)));
+        });
+
+        // Go home button — interstitial fires, returns to Home
         binding.btnGoHome.setOnClickListener(v -> {
             if (requireActivity() instanceof MainActivity) {
-                ((MainActivity) requireActivity()).switchFragment(new com.khatibstudio.gpacalc.ui.home.HomeFragment(), false);
+                MainActivity activity = (MainActivity) requireActivity();
+                AdManager.getInstance().showInterstitialAfterSave(
+                        activity, activity.getApplicationContext());
+                activity.switchFragment(new HomeFragment(), false);
             }
         });
     }
@@ -131,7 +191,7 @@ public class GpaRevealFragment extends Fragment {
         animator.addUpdateListener(animation -> {
             float animatedValue = (float) animation.getAnimatedValue();
             if (binding != null) {
-                binding.tvGpaNumber.setText(String.format("%.2f", animatedValue));
+                binding.tvGpaNumber.setText(String.format(Locale.US, "%.2f", animatedValue));
             }
         });
         animator.start();

@@ -16,6 +16,7 @@ import com.khatibstudio.gpacalc.data.entity.GradingScale;
 import com.khatibstudio.gpacalc.data.entity.InstitutionPreset;
 import com.khatibstudio.gpacalc.data.entity.Profile;
 import com.khatibstudio.gpacalc.databinding.FragmentHomeBinding;
+import com.khatibstudio.gpacalc.ads.AdManager;
 import com.khatibstudio.gpacalc.ui.MainActivity;
 import com.khatibstudio.gpacalc.ui.calculator.school.BoardGroupSelectorFragment;
 import com.khatibstudio.gpacalc.util.PreferencesHelper;
@@ -46,6 +47,9 @@ public class HomeFragment extends Fragment {
 
         setupGreeting();
         setupCardListeners();
+
+        // Banner ad — Home (high-traffic screen, user not mid-task)
+        AdManager.getInstance().loadBanner(requireContext(), binding.adBannerHome);
 
         // Update profile name when it changes
         viewModel.getActiveProfileId().observe(getViewLifecycleOwner(), id -> {

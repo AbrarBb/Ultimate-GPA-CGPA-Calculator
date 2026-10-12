@@ -145,6 +145,34 @@ public class GpaRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> db.schoolDao().deleteExamRecord(record));
     }
 
+    public void saveBoardExam(int profileId, String examType, String group, int scaleId, List<Subject> subjects, Runnable onDone) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            ExamRecord existing = db.schoolDao().getExamRecordByType(profileId, examType);
+            long recordId;
+            if (existing != null) {
+                existing.group = group;
+                existing.scaleId = scaleId;
+                db.schoolDao().updateExamRecord(existing);
+                recordId = existing.id;
+                db.schoolDao().deleteSubjectsForExam((int) recordId);
+            } else {
+                ExamRecord newRecord = new ExamRecord(examType, group, scaleId, profileId);
+                recordId = db.schoolDao().insertExamRecord(newRecord);
+            }
+
+            if (subjects != null) {
+                for (Subject s : subjects) {
+                    s.examRecordId = (int) recordId;
+                    db.schoolDao().insertSubject(s);
+                }
+            }
+
+            if (onDone != null) {
+                onDone.run();
+            }
+        });
+    }
+
     public LiveData<List<Subject>> getSubjects(int examRecordId) {
         return db.schoolDao().getSubjectsForExam(examRecordId);
     }

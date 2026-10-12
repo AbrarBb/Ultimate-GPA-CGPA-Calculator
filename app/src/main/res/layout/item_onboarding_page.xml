@@ -6,16 +6,29 @@
     android:layout_height="match_parent"
     android:padding="32dp">
 
-    <TextView
-        android:id="@+id/tv_emoji"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="64sp"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_icon_container"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="50dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:cardBackgroundColor="?attr/colorSurfaceVariant"
         app:layout_constraintBottom_toTopOf="@id/tv_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="center"
+            app:tint="?attr/colorPrimary"
+            android:contentDescription="@null" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tv_title"
@@ -29,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_emoji" />
+        app:layout_constraintTop_toBottomOf="@id/card_icon_container" />
 
     <TextView
         android:id="@+id/tv_description"

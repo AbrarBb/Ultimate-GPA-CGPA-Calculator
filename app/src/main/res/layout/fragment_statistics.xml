@@ -216,5 +216,14 @@
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- Banner Ad — Statistics (passive viewing, safe placement) -->
+        <FrameLayout
+            android:id="@+id/ad_banner_statistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
     </LinearLayout>
 </ScrollView>

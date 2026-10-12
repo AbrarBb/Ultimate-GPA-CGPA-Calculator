@@ -1,5 +1,6 @@
 package com.khatibstudio.gpacalc.ui.calculator.university;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.khatibstudio.gpacalc.R;
 import com.khatibstudio.gpacalc.data.AppDatabase;
 import com.khatibstudio.gpacalc.databinding.FragmentSemesterDetailBinding;
 import com.khatibstudio.gpacalc.repository.GpaRepository;
@@ -55,6 +57,16 @@ public class SemesterDetailFragment extends Fragment {
         String semesterName = requireArguments().getString(ARG_SEMESTER_NAME, "");
         binding.tvSemesterTitle.setText(semesterName);
         binding.tvSemesterGpa.setText("…");
+
+        binding.btnShareSemester.setOnClickListener(v -> {
+            String gpa = binding.tvSemesterGpa.getText().toString();
+            String title = binding.tvSemesterTitle.getText().toString();
+            String shareText = getString(R.string.share_result_template, title, gpa);
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_result)));
+        });
 
         adapter = new CourseAdapter(viewModel::deleteCourse);
         binding.recyclerCourses.setLayoutManager(new LinearLayoutManager(requireContext()));
